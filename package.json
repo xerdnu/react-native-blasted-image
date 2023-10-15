@@ -1,6 +1,6 @@
 {
   "name": "react-native-blasted-image",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple yet powerful image component for React Native, powered by Glide and SDWebImage",
   "main": "index.js",
   "scripts": {
@@ -10,13 +10,13 @@
     "react-native"
   ],
   "author": "xerdnu",
-  "license": "LICENSE",
+  "license": "MIT, BSD, Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xerdnu/react-native-blasted-image.git"
   },
   "peerDependencies": {
-    "react-native": "^0.60.0"
+    "react-native": ">=0.60.0"
   },
   "react-native": {
     "ios": {

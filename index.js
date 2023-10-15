@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { requireNativeComponent, NativeModules, Platform, Text, View } from 'react-native';
+import { requireNativeComponent, NativeModules, Platform, Image, View } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-blasted-image' doesn't seem to be linked. Make sure: \n\n` +
@@ -26,7 +26,6 @@ const BlastedImageView = requireNativeComponent('BlastedImageView');
 
 const BlastedImage = ({ source, width, height, style, resizeMode }) => {
   const [error, setError] = useState(false);
-  const [loadingSource, setLoadingSource] = useState(null); 
 
   if (!source || !source.uri) {
     console.log("Source not specified correctly -> <BlastedImage source={{ uri: 'https://example.com/image.jpg' }} />");
@@ -36,9 +35,9 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const result = await loadImage(source.uri, source.headers);
-        setLoadingSource(result); // Set the source of the image (memory, disk, network)
+        await loadImage(source.uri, source.headers);
       } catch (err) {
+        setError(true);
         console.error(err);
       }
     };
@@ -46,13 +45,16 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
     fetchImage();
   }, [source]);
 
+  // Flatten styles if provided as an array, otherwise use style as-is
+  const flattenedStyle = Array.isArray(style) ? Object.assign({}, ...style) : style;
+
   const defaultStyle = { overflow: 'hidden', backgroundColor: style?.borderColor || 'transparent' }; // Use border color as background
 
   const {
     width: styleWidth,  // Get width from style
     height: styleHeight, // Get height from style
     ...remainingStyle // All other styles excluding above
-  } = style || {};
+  } = flattenedStyle || {};
 
   // Override width and height if they exist in style
   width = width || styleWidth || 100; // First check the direct prop, then style, then default to 100
@@ -79,20 +81,22 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
 
   return (
     <View style={viewStyle}>
-      <BlastedImageView 
-        sourceUri={source.uri} 
-        width={adjustedWidth}
-        height={adjustedHeight}
-        resizeMode={resizeMode}
-        onError={() => setError(true)} 
-      />
-      {loadingSource && <Text>{loadingSource}</Text>}
+      {error ? (
+        <Image source={require('./assets/image-error.png')} style={{width:adjustedHeight,height:adjustedHeight}} resizeMode={resizeMode} />
+      ) : (
+        <BlastedImageView 
+          sourceUri={source.uri} 
+          width={adjustedWidth}
+          height={adjustedHeight}
+          resizeMode={resizeMode}
+        />
+      )}
     </View>
   );
 };
 
 BlastedImage.defaultProps = {
-  resizeMode: "contain"
+  resizeMode: "cover"
 };
 
 // clear memory cache

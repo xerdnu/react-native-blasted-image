@@ -46,7 +46,7 @@ import BlastedImage from 'react-native-blasted-image';
 | `source`     | `Object`          | (**Required**) Object containing a `uri` string for the remote image.                                   | -       |
 | `width`      | `Number`          | (Optional) Specifies the width of the image. `Overrides width in style`                                                        | 100     |
 | `height`     | `Number`          | (Optional) Specifies the height of the image. `Overrides height in style`                                                      | 100     |
-| `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `contain` `center` `stretch` `cover`  | contain |
+| `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover` `contain` `center` `stretch`  | cover |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.                            | -       |
 
 ## Methods

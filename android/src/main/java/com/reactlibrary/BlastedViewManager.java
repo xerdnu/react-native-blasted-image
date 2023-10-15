@@ -47,9 +47,9 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
     public void setResizeMode(ImageView view, String resizeMode) {
         Log.d("BlastedImageViewManager", "resizeMode value: " + resizeMode);
 
-        // If resizeMode is not specified or is invalid, set to contain
+        // If resizeMode is not specified or is invalid, set to cover
         if (resizeMode == null || resizeMode.isEmpty() || "undefined".equals(resizeMode)) {
-            resizeMode = "contain";
+            resizeMode = "cover";
         }
 
         if ("contain".equals(resizeMode)) {
@@ -61,7 +61,7 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
         } else if ("center".equals(resizeMode)) {
             view.setScaleType(ImageView.ScaleType.CENTER);
         } else {
-            view.setScaleType(ImageView.ScaleType.FIT_CENTER); // Default to contain
+            view.setScaleType(ImageView.ScaleType.CENTER_CROP); // Default to cover
         }
 
     }

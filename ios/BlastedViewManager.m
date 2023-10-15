@@ -31,7 +31,7 @@ RCT_CUSTOM_VIEW_PROPERTY(resizeMode, NSString, UIImageView) {
 
     // Check if resizeMode is nil, empty, or "undefined" then set default
     if (!resizeMode || [resizeMode isEqualToString:@""] || [resizeMode isEqualToString:@"undefined"]) {
-        resizeMode = @"contain";
+        resizeMode = @"cover";
     }
 
     if ([resizeMode isEqualToString:@"contain"]) {
@@ -43,7 +43,7 @@ RCT_CUSTOM_VIEW_PROPERTY(resizeMode, NSString, UIImageView) {
     } else if ([resizeMode isEqualToString:@"center"]) {
         [view setContentMode:UIViewContentModeCenter];
     } else {
-        [view setContentMode:UIViewContentModeScaleAspectFit]; // Default to contain
+        [view setContentMode:UIViewContentModeScaleAspectFill]; // Default to cover
     }
 }
 

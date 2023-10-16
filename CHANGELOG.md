@@ -1,3 +1,9 @@
+## [0.0.7] (2023-10-16)
+
+#### Changes
+
+-   Updated documentation.
+
 ## [0.0.6] (2023-10-16)
 
 #### Improvements
@@ -49,6 +55,7 @@
 
 -   Initial release.
 
+[0.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.3...v0.0.4

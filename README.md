@@ -6,11 +6,11 @@
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
 ## Description
-Caching has always been a challenge for me with the Image component in React Native. This simplified, yet powerful component, addresses that issue head-on.  It offers a robust and performant mechanism for caching remote images, ensuring they're displayed quickly.<br><br>With the strengths of Glide and SDWebImage, it supports both memory and disk caching. Notably, it achieves all of this without relying on the standard React Native Image component.
+Caching remote images has always been a challenge for me with the Image component in React Native. This simplified, yet powerful component, addresses that issue head-on. It offers a robust and performant mechanism for caching remote images, ensuring they're displayed quickly.<br><br>Leveraging the strengths of Glide and SDWebImage, it supports both memory and disk caching for remote images. Notably, while it provides these enhanced capabilities for remote images, it seamlessly integrates with the standard React Native Image component when handling local assets.
 
 ## Features
 
-- **Performance**: Bypasses the React Native Image component for remote images, ensuring immediate and lightning-fast display.
+- **Performance**: Bypasses the React Native Image component for remote images ensuring immediate and lightning-fast display of remote images.
 - **Cross-Platform**: Works on both Android (with [Glide](https://github.com/bumptech/glide)) and iOS (with [SDWebImage](https://github.com/SDWebImage/SDWebImage))
 - **Customizable**: Wrapped within a `View` for added layout and style customization.
 - **Robust Caching**: Benefits from both memory and disk caching for maximum performance.
@@ -34,18 +34,8 @@ Here's a simple example to get you started:
 ```jsx
 import BlastedImage from 'react-native-blasted-image';
 
-// Remote image
 <BlastedImage 
   source={{ uri: 'https://example.com/image.png' }} 
-  resizeMode="cover"
-  width={200}
-  height={200}
-  style={{ borderRadius: 10 }}
-/>
-
-// Local image
-<BlastedImage 
-  source={ require('./assets/image.png') } 
   resizeMode="cover"
   width={200}
   height={200}
@@ -56,10 +46,10 @@ import BlastedImage from 'react-native-blasted-image';
 ## Paramaters
 | Parameter    | Type              | Description                                                                                         | Default |
 |--------------|-------------------|-----------------------------------------------------------------------------------------------------|---------|
-| `source`     | `Object` or `require` | (**Required**) Can be an object containing a `uri` string for remote images or local images using `require`.     | -       |
+| `source`     | `Object`&nbsp;or&nbsp;`require` | (**Required**) Can be an object containing a `uri` string for remote images or local images using `require`.     | -       |
 | `width`      | `Number`          | (Optional) Specifies the width of the image. `Overrides width in style`                                                        | 100     |
 | `height`     | `Number`          | (Optional) Specifies the height of the image. `Overrides height in style`                                                      | 100     |
-| `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover` `contain` `center` `stretch`  | cover |
+| `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover`&nbsp;`contain`&nbsp;`center`&nbsp;`stretch`  | cover |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.                            | -       |
 
 ## Methods

@@ -27,12 +27,20 @@ const BlastedImageView = requireNativeComponent('BlastedImageView');
 const BlastedImage = ({ source, width, height, style, resizeMode }) => {
   const [error, setError] = useState(false);
 
-  if (!source || !source.uri) {
-    console.log("Source not specified correctly -> <BlastedImage source={{ uri: 'https://example.com/image.jpg' }} />");
+  if (!source || (!source.uri && typeof source !== 'number')) {
+    if (!source) {
+        console.error("Source not specified for BlastedImage.");
+    } else {
+        console.error("Source should be either a URI <BlastedImage source={{ uri: 'https://example.com/image.jpg' }} /> or a local image using <BlastedImage source={ require('https://example.com/image.jpg') } />");
+    }
     return null;
   }
 
   useEffect(() => {
+    if (typeof source === 'number') {
+      return;
+    }
+
     const fetchImage = async () => {
       try {
         await loadImage(source.uri, source.headers);
@@ -83,6 +91,8 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
     <View style={viewStyle}>
       {error ? (
         <Image source={require('./assets/image-error.png')} style={{width:adjustedHeight,height:adjustedHeight}} resizeMode={resizeMode} />
+      ) : (typeof source === 'number') ? (
+        <Image source={source} style={{ width: adjustedWidth, height: adjustedHeight }} resizeMode={resizeMode} />
       ) : (
         <BlastedImageView 
           sourceUri={source.uri} 

@@ -10,7 +10,7 @@ Caching has always been a challenge for me with the Image component in React Nat
 
 ## Features
 
-- **Performance**: Bypasses the React Native Image component for immediate and lightning-fast image display.
+- **Performance**: Bypasses the React Native Image component for remote images, ensuring immediate and lightning-fast display.
 - **Cross-Platform**: Works on both Android (with [Glide](https://github.com/bumptech/glide)) and iOS (with [SDWebImage](https://github.com/SDWebImage/SDWebImage))
 - **Customizable**: Wrapped within a `View` for added layout and style customization.
 - **Robust Caching**: Benefits from both memory and disk caching for maximum performance.
@@ -34,8 +34,18 @@ Here's a simple example to get you started:
 ```jsx
 import BlastedImage from 'react-native-blasted-image';
 
+// Remote image
 <BlastedImage 
-  source={{ uri: 'https://example.com/image.jpg' }} 
+  source={{ uri: 'https://example.com/image.png' }} 
+  resizeMode="cover"
+  width={200}
+  height={200}
+  style={{ borderRadius: 10 }}
+/>
+
+// Local image
+<BlastedImage 
+  source={ require('./assets/image.png') } 
   resizeMode="cover"
   width={200}
   height={200}
@@ -46,7 +56,7 @@ import BlastedImage from 'react-native-blasted-image';
 ## Paramaters
 | Parameter    | Type              | Description                                                                                         | Default |
 |--------------|-------------------|-----------------------------------------------------------------------------------------------------|---------|
-| `source`     | `Object`          | (**Required**) Object containing a `uri` string for the remote image.                                   | -       |
+| `source`     | `Object` or `require` | (**Required**) Can be an object containing a `uri` string for remote images or local images using `require`.     | -       |
 | `width`      | `Number`          | (Optional) Specifies the width of the image. `Overrides width in style`                                                        | 100     |
 | `height`     | `Number`          | (Optional) Specifies the height of the image. `Overrides height in style`                                                      | 100     |
 | `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover` `contain` `center` `stretch`  | cover |
@@ -63,7 +73,7 @@ BlastedImage.preload([
 ```
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `Array<{ uri: string }>`  | Preloads images from an array of URIs.                   |
+| `BlastedImage.preload()`        | `Array<{ uri: string }>`  | Preloads remote images from an array of URIs.                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |
@@ -84,7 +94,7 @@ useEffect(() => {
 ```
 | Event                          | Description                                              |
 |---------------------------------|-------------------------------------------------------------------|
-| `BlastedEventLoaded`        | Triggered when images are successfully loaded.                  |
+| `BlastedEventLoaded`        | Triggered when remote images are successfully loaded.                  |
 | `BlastedEventClearedMemory` | Triggered when the memory cache for all images is cleared.                    |
 | `BlastedEventClearedDisk`| Triggered when the disk cache for all images is cleared.                  |
 | `BlastedEventClearedAll` | Triggered when both disk and memory caches for all images are cleared.       |

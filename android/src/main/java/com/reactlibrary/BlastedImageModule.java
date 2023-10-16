@@ -56,6 +56,16 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
         return NAME;
     }
 
+    @ReactMethod
+    public void addListener(String eventName) {
+        // Do nothing
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+        // Do nothing
+    }
+
     // Show/Preload the image
     @ReactMethod
     public void loadImage(String imageUrl, ReadableMap headersMap, Promise promise) {

@@ -1,4 +1,7 @@
 # :rocket: BlastedImage
+[![npm downloads](https://img.shields.io/npm/dm/react-native-blasted-image.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-blasted-image)
+[![platform - android](https://img.shields.io/badge/platform-Android-3ddc84.svg?logo=android&style=for-the-badge)](https://www.android.com)
+[![platform - ios](https://img.shields.io/badge/platform-iOS-0067b8.svg?logo=apple&style=for-the-badge)](https://developer.apple.com/ios)
 
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
@@ -95,4 +98,4 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 ## License
 -   BlastedImage - `MIT` :copyright: [xerdnu](https://github.com/xerdnu)
 -   SDWebImage - `MIT`
--   Glide - `BSD`, part `MIT` and `Apache 2.0`. See the [LICENSE](https://github.com/bumptech/glide/blob/master/license) file for details.
+-   Glide - `BSD`, part `MIT` and `Apache 2.0`. See the [LICENSE](https://github.com/bumptech/glide/blob/master/LICENSE) file for details.

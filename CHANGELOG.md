@@ -1,3 +1,14 @@
+## [0.0.8] (2023-10-17)
+
+#### Improvements
+
+-   Added the skipMemoryCache preload prop to preload images only to disk, keeping memory free.
+-   Added return logs within the bridge.
+-   Made a few minor fixes in the Android code.
+
+#### Changes
+-   Updated documentation.
+
 ## [0.0.7] (2023-10-16)
 
 #### Changes

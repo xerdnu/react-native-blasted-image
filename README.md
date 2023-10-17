@@ -58,12 +58,12 @@ import BlastedImage from 'react-native-blasted-image';
 
 BlastedImage.preload([
   { uri: 'https://example.com/image1.jpg' },
-  { uri: 'https://example.com/image2.jpg' },
+  { uri: 'https://example.com/image2.jpg', skipMemoryCache: true },
 ]);
 ```
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `Array<{ uri: string }>`  | Preloads remote images from an array of URIs.                   |
+| `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |

@@ -18,9 +18,9 @@ const NativeBlastedImage = NativeModules.BlastedImage
       }
   );
 
-export const loadImage = (imageUrl, headers = {}) => {
-  return NativeBlastedImage.loadImage(imageUrl, headers);
-};
+  export const loadImage = (imageUrl, headers = {}, skipMemoryCache = false) => {
+    return NativeBlastedImage.loadImage(imageUrl, headers, skipMemoryCache);
+  };
 
 const BlastedImageView = requireNativeComponent('BlastedImageView');
 
@@ -76,6 +76,16 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
       borderRightWidth = borderWidth,
   } = remainingStyle;
 
+  if (typeof width === 'string' && width.includes('%')) {
+    console.log("Percentage-based width is not yet supported in BlastedImage. Please open an issue on github if you have a need for this.");
+    return;
+  }
+  
+  if (typeof height === 'string' && height.includes('%')) {
+    console.log("Percentage-based height is not yet supported in BlastedImage. Please open an issue on github if you have a need for this.");
+    return;
+  }
+
   // Calculate the adjusted width and height
   const adjustedWidth = width - (borderLeftWidth + borderRightWidth);
   const adjustedHeight = height - (borderTopWidth + borderBottomWidth);
@@ -126,7 +136,7 @@ BlastedImage.clearAllCaches = () => {
 
 BlastedImage.preload = (images) => {
   images.forEach(image => {
-    loadImage(image.uri, image.headers).catch(() => {
+    loadImage(image.uri, image.headers, image.skipMemoryCache).catch(() => {
       // Log errors later if necessary
     });
   });

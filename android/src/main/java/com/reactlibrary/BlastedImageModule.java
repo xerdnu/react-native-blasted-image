@@ -68,7 +68,7 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
 
     // Show/Preload the image
     @ReactMethod
-    public void loadImage(String imageUrl, ReadableMap headersMap, Promise promise) {
+    public void loadImage(String imageUrl, ReadableMap headersMap, boolean skipMemoryCache, Promise promise) {
         try {
             GlideUrl glideUrl;
             if (headersMap != null && !headersMap.toHashMap().isEmpty()) {
@@ -88,9 +88,15 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
                 glideUrl = new GlideUrl(imageUrl);
             }
 
+            // Is skip skipMemoryCache set for image and should we store it only to disk?
+            RequestOptions requestOptions = new RequestOptions();
+            if (skipMemoryCache) {
+                requestOptions = requestOptions.skipMemoryCache(true);
+            }
+
             Glide.with(getReactApplicationContext())
                 .load(glideUrl)
-                .apply(new RequestOptions().centerCrop())
+                .apply(requestOptions)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

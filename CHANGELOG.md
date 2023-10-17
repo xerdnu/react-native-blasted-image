@@ -2,7 +2,7 @@
 
 #### Improvements
 
--   Added the skipMemoryCache preload prop to preload images only to disk, keeping memory free.
+-   Added the `skipMemoryCache` preload prop to preload images only to disk, keeping memory free.
 -   Added return logs within the bridge.
 -   Made a few minor fixes in the Android code.
 
@@ -66,6 +66,7 @@
 
 -   Initial release.
 
+[0.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.4...v0.0.5

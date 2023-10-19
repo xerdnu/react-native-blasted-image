@@ -1,3 +1,14 @@
+## [0.0.9] (2023-10-18)
+
+#### Improvements
+
+-   Added the possiblity to pass both `single objects` and `arrays` to `BlastedImage.preload`.
+-   Added `promise` for `BlastedImage.preload` to indicate when the image has been processed.
+
+#### Changes
+
+-   Updated documentation.
+
 ## [0.0.8] (2023-10-17)
 
 #### Improvements
@@ -66,6 +77,7 @@
 
 -   Initial release.
 
+[0.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.5...v0.0.6

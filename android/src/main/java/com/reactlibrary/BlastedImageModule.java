@@ -117,6 +117,8 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
                         }
 
                         sendEvent(getReactApplicationContext(), "BlastedEventLoaded", message);
+
+                        promise.resolve(true);
                         
                         return false;
                     }

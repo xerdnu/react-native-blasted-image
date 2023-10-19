@@ -19,8 +19,11 @@ const NativeBlastedImage = NativeModules.BlastedImage
   );
 
   export const loadImage = (imageUrl, headers = {}, skipMemoryCache = false) => {
-    return NativeBlastedImage.loadImage(imageUrl, headers, skipMemoryCache);
-  };
+    return NativeBlastedImage.loadImage(imageUrl, headers, skipMemoryCache)
+    .catch((error) => {
+      console.error("Error loading image:", error);
+    });
+};
 
 const BlastedImageView = requireNativeComponent('BlastedImageView');
 
@@ -134,12 +137,41 @@ BlastedImage.clearAllCaches = () => {
   return NativeBlastedImage.clearAllCaches();
 };
 
-BlastedImage.preload = (images) => {
-  images.forEach(image => {
-    loadImage(image.uri, image.headers, image.skipMemoryCache).catch(() => {
-      // Log errors later if necessary
-    });
+BlastedImage.preload = (input) => {
+  return new Promise((resolve) => {
+      // single object
+      if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
+          loadImage(input.uri, input.headers, input.skipMemoryCache)
+              .then(() => {
+                  resolve();
+              })
+              .catch((err) => {
+                  console.error("Error preloading single image:", err);
+                  resolve(); // Count as handled even if failed to continue processing
+              });
+      }
+      // array
+      else if (Array.isArray(input)) {
+          let loadedCount = 0;
+          input.forEach(image => {
+              loadImage(image.uri, image.headers, image.skipMemoryCache)
+                  .then(() => {
+                      loadedCount++;
+                      if (loadedCount === input.length) {
+                          resolve();
+                      }
+                  })
+                  .catch((err) => {
+                      console.error("Error preloading one of the array images:", err);
+                      loadedCount++; // Count as handled even if failed to continue processing
+                      if (loadedCount === input.length) {
+                          resolve();
+                      }
+                  });
+          });
+      }
   });
 };
+
 
 export default BlastedImage;

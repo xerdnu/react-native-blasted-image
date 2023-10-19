@@ -72,6 +72,8 @@ BlastedImage.preload([
 ```jsx
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
+const BlastedImageEvents = new NativeEventEmitter(NativeModules.BlastedImage);
+
 useEffect(() => {
   const subscription = BlastedImageEvents.addListener('BlastedEventLoaded', (data) => {
     console.log(data.message);

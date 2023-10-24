@@ -22,12 +22,13 @@ const NativeBlastedImage = NativeModules.BlastedImage
     return NativeBlastedImage.loadImage(imageUrl, headers, skipMemoryCache)
     .catch((error) => {
       console.error("Error loading image:", error);
+      throw error;
     });
 };
 
 const BlastedImageView = requireNativeComponent('BlastedImageView');
 
-const BlastedImage = ({ source, width, height, style, resizeMode }) => {
+const BlastedImage = ({ source, width, height, style, resizeMode, isBackground, children }) => {
   const [error, setError] = useState(false);
 
   if (!source || (!source.uri && typeof source !== 'number')) {
@@ -59,7 +60,7 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
   // Flatten styles if provided as an array, otherwise use style as-is
   const flattenedStyle = Array.isArray(style) ? Object.assign({}, ...style) : style;
 
-  const defaultStyle = { overflow: 'hidden', backgroundColor: style?.borderColor || 'transparent' }; // Use border color as background
+  const defaultStyle = { overflow: 'hidden', position: 'relative', backgroundColor: style?.borderColor || 'transparent' }; // Use border color as background
 
   const {
     width: styleWidth,  // Get width from style
@@ -100,26 +101,62 @@ const BlastedImage = ({ source, width, height, style, resizeMode }) => {
     height,
   };
 
+  const childrenStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    justifyContent:'center',
+    alignItems:'center',
+    width: adjustedWidth,
+    height: adjustedHeight,
+  };  
+
   return (
-    <View style={viewStyle}>
-      {error ? (
-        <Image source={require('./assets/image-error.png')} style={{width:adjustedHeight,height:adjustedHeight}} resizeMode={resizeMode} />
-      ) : (typeof source === 'number') ? (
-        <Image source={source} style={{ width: adjustedWidth, height: adjustedHeight }} resizeMode={resizeMode} />
+    <View style={!isBackground ? viewStyle : null}>
+      {isBackground ? (
+        <View style={viewStyle}>
+          {renderImageContent(error, source, adjustedHeight, adjustedWidth, resizeMode)}
+        </View>
       ) : (
-        <BlastedImageView 
-          sourceUri={source.uri} 
-          width={adjustedWidth}
-          height={adjustedHeight}
-          resizeMode={resizeMode}
-        />
+        renderImageContent(error, source, adjustedHeight, adjustedWidth, resizeMode)
       )}
+      {isBackground && <View style={childrenStyle}>{children}</View>}
     </View>
   );
 };
 
+function renderImageContent(error, source, adjustedHeight, adjustedWidth, resizeMode) {
+  if (error) {
+    return (
+      <Image
+        source={require('./assets/image-error.png')}
+        style={{ width: adjustedHeight, height: adjustedHeight }}
+        resizeMode={resizeMode}
+      />
+    );
+  } else if (typeof source === 'number') {
+    return (
+      <Image
+        source={source}
+        style={{ width: adjustedWidth, height: adjustedHeight }}
+        resizeMode={resizeMode}
+      />
+    );
+  } else {
+    return (
+      <BlastedImageView
+        sourceUri={source.uri}
+        width={adjustedWidth}
+        height={adjustedHeight}
+        resizeMode={resizeMode}
+      />
+    );
+  }
+}
+
 BlastedImage.defaultProps = {
-  resizeMode: "cover"
+  resizeMode: "cover",
+  isBackground: false
 };
 
 // clear memory cache

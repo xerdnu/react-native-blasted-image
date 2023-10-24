@@ -1,6 +1,6 @@
 {
   "name": "react-native-blasted-image",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A simple yet powerful image component for React Native, powered by Glide and SDWebImage",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,9 @@
     "react-native",
     "cached",
     "image",
-    "image-cache"
+    "image-cache",
+    "fastimage",
+    "fast-image"
   ],
   "author": "xerdnu",
   "license": "MIT, BSD, Apache-2.0",

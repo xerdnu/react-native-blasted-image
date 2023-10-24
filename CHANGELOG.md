@@ -1,3 +1,17 @@
+## [0.0.10] (2023-10-24)
+
+#### Improvements
+
+-   Added the prop `isBackground` to act as a container background similar to the native `ImageBackground` component.
+
+#### Bug Fixes
+
+-   Fixed a bug that caused the error image not to display.
+
+#### Changes
+
+-   Updated documentation.
+
 ## [0.0.9] (2023-10-19)
 
 #### Improvements
@@ -77,6 +91,7 @@
 
 -   Initial release.
 
+[0.0.10]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.6...v0.0.7

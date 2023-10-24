@@ -50,6 +50,7 @@ import BlastedImage from 'react-native-blasted-image';
 | `width`      | `Number`          | (Optional) Specifies the width of the image. `Overrides width in style`                                                        | 100     |
 | `height`     | `Number`          | (Optional) Specifies the height of the image. `Overrides height in style`                                                      | 100     |
 | `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover`&nbsp;`contain`&nbsp;`center`&nbsp;`stretch`  | cover |
+| `isBackground` | `Boolean`          | (Optional) Makes the image act as a container background similar to the native `ImageBackground` component  | false |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.                            | -       |
 
 ## Methods

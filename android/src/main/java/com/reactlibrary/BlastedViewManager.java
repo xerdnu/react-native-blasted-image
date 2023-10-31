@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package com.xerdnu.blastedimage;
 
 import com.bumptech.glide.Glide;
 import com.facebook.react.uimanager.SimpleViewManager;

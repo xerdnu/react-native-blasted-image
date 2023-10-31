@@ -81,12 +81,12 @@ const BlastedImage = ({ source, width, height, style, resizeMode, isBackground, 
   } = remainingStyle;
 
   if (typeof width === 'string' && width.includes('%')) {
-    console.log("Percentage-based width is not yet supported in BlastedImage. Please open an issue on github if you have a need for this.");
+    console.log("For maximum performance, BlastedImage does not support width defined as a percentage");
     return;
   }
   
   if (typeof height === 'string' && height.includes('%')) {
-    console.log("Percentage-based height is not yet supported in BlastedImage. Please open an issue on github if you have a need for this.");
+    console.log("For maximum performance, BlastedImage does not support height defined as a percentage");
     return;
   }
 

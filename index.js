@@ -28,7 +28,7 @@ const NativeBlastedImage = NativeModules.BlastedImage
 
 const BlastedImageView = requireNativeComponent('BlastedImageView');
 
-const BlastedImage = ({ source, width, height, style, resizeMode, isBackground, children }) => {
+const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, style, resizeMode, isBackground, children }) => {
   const [error, setError] = useState(false);
 
   if (!source || (!source.uri && typeof source !== 'number')) {
@@ -48,9 +48,11 @@ const BlastedImage = ({ source, width, height, style, resizeMode, isBackground, 
     const fetchImage = async () => {
       try {
         await loadImage(source.uri, source.headers);
+        onLoad?.();
       } catch (err) {
         setError(true);
         console.error(err);
+        onError?.(err);
       }
     };
 
@@ -84,7 +86,7 @@ const BlastedImage = ({ source, width, height, style, resizeMode, isBackground, 
     console.log("For maximum performance, BlastedImage does not support width defined as a percentage");
     return;
   }
-  
+
   if (typeof height === 'string' && height.includes('%')) {
     console.log("For maximum performance, BlastedImage does not support height defined as a percentage");
     return;
@@ -109,31 +111,35 @@ const BlastedImage = ({ source, width, height, style, resizeMode, isBackground, 
     alignItems:'center',
     width: adjustedWidth,
     height: adjustedHeight,
-  };  
+  };
 
   return (
     <View style={!isBackground ? viewStyle : null}>
       {isBackground ? (
         <View style={viewStyle}>
-          {renderImageContent(error, source, adjustedHeight, adjustedWidth, resizeMode)}
+          {renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)}
         </View>
       ) : (
-        renderImageContent(error, source, adjustedHeight, adjustedWidth, resizeMode)
+        renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)
       )}
       {isBackground && <View style={childrenStyle}>{children}</View>}
     </View>
   );
 };
 
-function renderImageContent(error, source, adjustedHeight, adjustedWidth, resizeMode) {
+function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode) {
   if (error) {
-    return (
-      <Image
-        source={require('./assets/image-error.png')}
-        style={{ width: adjustedHeight, height: adjustedHeight }}
-        resizeMode={resizeMode}
-      />
-    );
+    if (fallbackSource) {
+      return (
+        <Image
+          source={fallbackSource}
+          style={{ width: adjustedHeight, height: adjustedHeight }}
+          resizeMode={resizeMode}
+        />
+      );
+    } else {
+      return null;
+    }
   } else if (typeof source === 'number') {
     return (
       <Image

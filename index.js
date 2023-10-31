@@ -129,7 +129,7 @@ const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, 
 
 function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode) {
   if (error) {
-    if (fallbackSource) {
+    if (fallbackSource) { // Error - Fallback specified, use native component
       return (
         <Image
           source={fallbackSource}
@@ -137,10 +137,16 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
           resizeMode={resizeMode}
         />
       );
-    } else {
-      return null;
+    } else { // Error - No fallback, use native component with static asset
+      return (
+        <Image
+          source={require('./assets/image-error.png')}
+          style={{ width: adjustedHeight, height: adjustedHeight }}
+          resizeMode={resizeMode}
+        />
+      );
     }
-  } else if (typeof source === 'number') {
+  } else if (typeof source === 'number') { // Success - with local asset
     return (
       <Image
         source={source}
@@ -148,7 +154,7 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
         resizeMode={resizeMode}
       />
     );
-  } else {
+  } else { // Success - with remote asset
     return (
       <BlastedImageView
         sourceUri={source.uri}
@@ -162,7 +168,8 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 
 BlastedImage.defaultProps = {
   resizeMode: "cover",
-  isBackground: false
+  isBackground: false,
+  fallbackSource: null
 };
 
 // clear memory cache

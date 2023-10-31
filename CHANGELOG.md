@@ -1,3 +1,15 @@
+## [0.0.12] (2023-10-31)
+
+#### Improvements
+
+-   Added proper `onLoad` and `onError` callbacks. ([#3](https://github.com/xerdnu/react-native-blasted-image/pull/3))
+-   Added `fallbackSource` prop when image could not load. ([#3](https://github.com/xerdnu/react-native-blasted-image/pull/3))
+
+#### Changes
+
+-   Included static fallback image in cases where both the primary source and the fallbackSource fail to load.
+-   Updated documentation.
+
 ## [0.0.11] (2023-10-31)
 
 #### Changes
@@ -98,6 +110,7 @@
 
 -   Initial release.
 
+[0.0.12]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.8...v0.0.9

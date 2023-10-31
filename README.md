@@ -51,6 +51,9 @@ import BlastedImage from 'react-native-blasted-image';
 | `height`     | `Number`          | (Optional) Specifies the height of the image. `Overrides height in style`                                                      | 100     |
 | `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover`&nbsp;`contain`&nbsp;`center`&nbsp;`stretch`  | cover |
 | `isBackground` | `Boolean`          | (Optional) Makes the image act as a container background similar to the native `ImageBackground` component  | false |
+| `fallbackSource` | `Object`          | (Optional) Object containing a `uri` string for a custom error image.  | - |
+| `onLoad` | `Function`          | (Optional) Callback function that gets called when the image has loaded succesfully.  | - |
+| `onError` | `Function`          | (Optional) Callback function that gets called when there was an error loading the image.  | - |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.                            | -       |
 
 ## Methods

@@ -1,3 +1,9 @@
+## [0.0.13] (2023-12-19)
+
+#### Improvements
+
+-   Added proper initialization value for `onLoad` callback. ([#4](https://github.com/xerdnu/react-native-blasted-image/pull/4))
+
 ## [0.0.12] (2023-10-31)
 
 #### Improvements
@@ -110,6 +116,7 @@
 
 -   Initial release.
 
+[0.0.13]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.9...v0.0.10

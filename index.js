@@ -47,8 +47,8 @@ const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, 
 
     const fetchImage = async () => {
       try {
-        await loadImage(source.uri, source.headers);
         setError(false);
+        await loadImage(source.uri, source.headers);
         onLoad?.();
       } catch (err) {
         setError(true);

@@ -203,6 +203,11 @@ BlastedImage.preload = (input) => {
       }
       // array
       else if (Array.isArray(input)) {
+		  if (loadImage.length === 0) {
+		      resolve();
+		      return;
+		  }
+
           let loadedCount = 0;
           input.forEach(image => {
               loadImage(image.uri, image.headers, image.skipMemoryCache)

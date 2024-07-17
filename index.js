@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { requireNativeComponent, NativeModules, Platform, Image, View } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  requireNativeComponent,
+  NativeModules,
+  Platform,
+  Image,
+  View,
+} from "react-native";
 
 const LINKING_ERROR =
   `The package 'react-native-blasted-image' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+  Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
+  "- You rebuilt the app after installing the package\n" +
+  "- You are not using Expo Go\n";
 
 const NativeBlastedImage = NativeModules.BlastedImage
   ? NativeModules.BlastedImage
@@ -16,32 +22,46 @@ const NativeBlastedImage = NativeModules.BlastedImage
           throw new Error(LINKING_ERROR);
         },
       }
-  );
+    );
 
-  export const loadImage = (imageUrl, headers = {}, skipMemoryCache = false) => {
-    return NativeBlastedImage.loadImage(imageUrl, headers, skipMemoryCache)
-    .catch((error) => {
+export const loadImage = (imageUrl, headers = {}, skipMemoryCache = false) => {
+  return NativeBlastedImage.loadImage(imageUrl, headers, skipMemoryCache).catch(
+    (error) => {
       console.error("Error loading image:", error);
       throw error;
-    });
+    }
+  );
 };
 
-const BlastedImageView = requireNativeComponent('BlastedImageView');
+const BlastedImageView = requireNativeComponent("BlastedImageView");
 
-const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, style, resizeMode, isBackground, children }) => {
+const BlastedImage = ({
+  source,
+  width,
+  onLoad,
+  onError,
+  fallbackSource = null,
+  height,
+  style,
+  resizeMode = "cover",
+  isBackground = false,
+  children,
+}) => {
   const [error, setError] = useState(false);
 
-  if (!source || (!source.uri && typeof source !== 'number')) {
+  if (!source || (!source.uri && typeof source !== "number")) {
     if (!source) {
-        console.error("Source not specified for BlastedImage.");
+      console.error("Source not specified for BlastedImage.");
     } else {
-        console.error("Source should be either a URI <BlastedImage source={{ uri: 'https://example.com/image.jpg' }} /> or a local image using <BlastedImage source={ require('https://example.com/image.jpg') } />");
+      console.error(
+        "Source should be either a URI <BlastedImage source={{ uri: 'https://example.com/image.jpg' }} /> or a local image using <BlastedImage source={ require('https://example.com/image.jpg') } />"
+      );
     }
     return null;
   }
 
   useEffect(() => {
-    if (typeof source === 'number') {
+    if (typeof source === "number") {
       return;
     }
 
@@ -61,12 +81,18 @@ const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, 
   }, [source]);
 
   // Flatten styles if provided as an array, otherwise use style as-is
-  const flattenedStyle = Array.isArray(style) ? Object.assign({}, ...style) : style;
+  const flattenedStyle = Array.isArray(style)
+    ? Object.assign({}, ...style)
+    : style;
 
-  const defaultStyle = { overflow: 'hidden', position: 'relative', backgroundColor: style?.borderColor || 'transparent' }; // Use border color as background
+  const defaultStyle = {
+    overflow: "hidden",
+    position: "relative",
+    backgroundColor: style?.borderColor || "transparent",
+  }; // Use border color as background
 
   const {
-    width: styleWidth,  // Get width from style
+    width: styleWidth, // Get width from style
     height: styleHeight, // Get height from style
     ...remainingStyle // All other styles excluding above
   } = flattenedStyle || {};
@@ -76,20 +102,24 @@ const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, 
   height = height || styleHeight || 100; // First check the direct prop, then style, then default to 100
 
   const {
-      borderWidth = 0,
-      borderTopWidth = borderWidth,
-      borderBottomWidth = borderWidth,
-      borderLeftWidth = borderWidth,
-      borderRightWidth = borderWidth,
+    borderWidth = 0,
+    borderTopWidth = borderWidth,
+    borderBottomWidth = borderWidth,
+    borderLeftWidth = borderWidth,
+    borderRightWidth = borderWidth,
   } = remainingStyle;
 
-  if (typeof width === 'string' && width.includes('%')) {
-    console.log("For maximum performance, BlastedImage does not support width defined as a percentage");
+  if (typeof width === "string" && width.includes("%")) {
+    console.log(
+      "For maximum performance, BlastedImage does not support width defined as a percentage"
+    );
     return;
   }
 
-  if (typeof height === 'string' && height.includes('%')) {
-    console.log("For maximum performance, BlastedImage does not support height defined as a percentage");
+  if (typeof height === "string" && height.includes("%")) {
+    console.log(
+      "For maximum performance, BlastedImage does not support height defined as a percentage"
+    );
     return;
   }
 
@@ -105,11 +135,11 @@ const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, 
   };
 
   const childrenStyle = {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
-    justifyContent:'center',
-    alignItems:'center',
+    justifyContent: "center",
+    alignItems: "center",
     width: adjustedWidth,
     height: adjustedHeight,
   };
@@ -118,19 +148,41 @@ const BlastedImage = ({ source, width, onLoad, onError, fallbackSource, height, 
     <View style={!isBackground ? viewStyle : null}>
       {isBackground ? (
         <View style={viewStyle}>
-          {renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)}
+          {renderImageContent(
+            error,
+            source,
+            fallbackSource,
+            adjustedHeight,
+            adjustedWidth,
+            resizeMode
+          )}
         </View>
       ) : (
-        renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)
+        renderImageContent(
+          error,
+          source,
+          fallbackSource,
+          adjustedHeight,
+          adjustedWidth,
+          resizeMode
+        )
       )}
       {isBackground && <View style={childrenStyle}>{children}</View>}
     </View>
   );
 };
 
-function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode) {
+function renderImageContent(
+  error,
+  source,
+  fallbackSource,
+  adjustedHeight,
+  adjustedWidth,
+  resizeMode
+) {
   if (error) {
-    if (fallbackSource) { // Error - Fallback specified, use native component
+    if (fallbackSource) {
+      // Error - Fallback specified, use native component
       return (
         <Image
           source={fallbackSource}
@@ -138,16 +190,18 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
           resizeMode={resizeMode}
         />
       );
-    } else { // Error - No fallback, use native component with static asset
+    } else {
+      // Error - No fallback, use native component with static asset
       return (
         <Image
-          source={require('./assets/image-error.png')}
+          source={require("./assets/image-error.png")}
           style={{ width: adjustedHeight, height: adjustedHeight }}
           resizeMode={resizeMode}
         />
       );
     }
-  } else if (typeof source === 'number') { // Success - with local asset
+  } else if (typeof source === "number") {
+    // Success - with local asset
     return (
       <Image
         source={source}
@@ -155,7 +209,8 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
         resizeMode={resizeMode}
       />
     );
-  } else { // Success - with remote asset
+  } else {
+    // Success - with remote asset
     return (
       <BlastedImageView
         sourceUri={source.uri}
@@ -166,12 +221,6 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
     );
   }
 }
-
-BlastedImage.defaultProps = {
-  resizeMode: "cover",
-  isBackground: false,
-  fallbackSource: null
-};
 
 // clear memory cache
 BlastedImage.clearMemoryCache = () => {
@@ -190,39 +239,38 @@ BlastedImage.clearAllCaches = () => {
 
 BlastedImage.preload = (input) => {
   return new Promise((resolve) => {
-      // single object
-      if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
-          loadImage(input.uri, input.headers, input.skipMemoryCache)
-              .then(() => {
-                  resolve();
-              })
-              .catch((err) => {
-                  console.error("Error preloading single image:", err);
-                  resolve(); // Count as handled even if failed to continue processing
-              });
-      }
-      // array
-      else if (Array.isArray(input)) {
-          let loadedCount = 0;
-          input.forEach(image => {
-              loadImage(image.uri, image.headers, image.skipMemoryCache)
-                  .then(() => {
-                      loadedCount++;
-                      if (loadedCount === input.length) {
-                          resolve();
-                      }
-                  })
-                  .catch((err) => {
-                      console.error("Error preloading one of the array images:", err);
-                      loadedCount++; // Count as handled even if failed to continue processing
-                      if (loadedCount === input.length) {
-                          resolve();
-                      }
-                  });
+    // single object
+    if (typeof input === "object" && input !== null && !Array.isArray(input)) {
+      loadImage(input.uri, input.headers, input.skipMemoryCache)
+        .then(() => {
+          resolve();
+        })
+        .catch((err) => {
+          console.error("Error preloading single image:", err);
+          resolve(); // Count as handled even if failed to continue processing
+        });
+    }
+    // array
+    else if (Array.isArray(input)) {
+      let loadedCount = 0;
+      input.forEach((image) => {
+        loadImage(image.uri, image.headers, image.skipMemoryCache)
+          .then(() => {
+            loadedCount++;
+            if (loadedCount === input.length) {
+              resolve();
+            }
+          })
+          .catch((err) => {
+            console.error("Error preloading one of the array images:", err);
+            loadedCount++; // Count as handled even if failed to continue processing
+            if (loadedCount === input.length) {
+              resolve();
+            }
           });
-      }
+      });
+    }
   });
 };
-
 
 export default BlastedImage;

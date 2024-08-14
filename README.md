@@ -63,7 +63,7 @@ import BlastedImage from 'react-native-blasted-image';
 | `onLoad` | `Function`          | (Optional) Callback function that gets called when the image has loaded succesfully.  | - |
 | `onError` | `Function`          | (Optional) Callback function that gets called when there was an error loading the image.  | - |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.       
-| `hybridassets` | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.  | false |
+| `hybridAssets` | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.  | false |
 | `cloudUrl`      | `String`          | (Required if hybridassets is enabled) Leading URL to the remote assets for Hybrid Assets functionality.                     | -       |
 
 ## Methods

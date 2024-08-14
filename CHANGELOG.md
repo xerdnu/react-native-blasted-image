@@ -1,3 +1,32 @@
+## [1.0.0] (2024-08-14)
+
+#### New Features
+
+-   **Hybrid Assets:** Created a new feature called Hybrid Assets that makes it possible to bundle local assets within your build and only fetch from the network if assets are not included. This helps save bandwidth by bundling assets you know is gonna be used in your current version. To enable this just pass `hybridAssets` as `true` and provide a `cloudUrl`. If using Firebase, the component will automatically handle `%2F` replacements and trailing ?alt=media removal in the URL. Refer to the documentation for more details.
+-   **Automatic Hybrid Assets Bundling:**  Implemented a function for automatic copying and bundling of hybrid assets to iOS and Android that also includes automatic reference creation in Xcode (Expo Only).
+-   **TypeScript Support:** Added TypeScript support ([#15](https://github.com/xerdnu/react-native-blasted-image/pull/15), [#10](https://github.com/xerdnu/react-native-blasted-image/issues/10))
+
+#### Improvements
+
+-   Reworked the logic for how images are loaded and displayed
+-   Reworked major parts of the component to include support for hybrid remote assets.
+-   Reworked various parts of the components code that improves readability and fixes several bugs.
+-   Maximum disk caching size is now static and set to 1GB.
+-   Maximum memory caching size is now static and set to 100MB.
+-   Fixed maximum lifetime of disk caching on iOS that ensures no maximum lifetime.
+
+#### Changes
+
+-   Changed return informational errors for better debugging.
+-   Updated the logging events for better visibility.
+-   Removed the ability to pass source headers due to stability concerns.   
+-   Updated documentation.
+
+#### Bug Fixes
+-   Fixed a bug where the component would crash due to a destroyed activity. ([#13](https://github.com/xerdnu/react-native-blasted-image/issues/13))
+-   Resolved a warning related to `defaultProps` deprecation and replaced them with javascript default parameters. ([#18](https://github.com/xerdnu/react-native-blasted-image/pull/18), [#16](https://github.com/xerdnu/react-native-blasted-image/issues/16))
+-   Fixed a bug where no resolve occurred when an empty array was sent in preload. ([#15](https://github.com/xerdnu/react-native-blasted-image/pull/15), [#8](https://github.com/xerdnu/react-native-blasted-image/pull/8))
+
 ## [0.0.13] (2023-12-19)
 
 #### Improvements
@@ -116,6 +145,7 @@
 
 -   Initial release.
 
+[1.0.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.13...v1.0.0
 [0.0.13]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.10...v0.0.11

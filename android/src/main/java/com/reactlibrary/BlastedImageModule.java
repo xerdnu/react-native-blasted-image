@@ -18,37 +18,28 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
-import com.bumptech.glide.load.model.Headers;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
+import com.bumptech.glide.load.engine.cache.LruResourceCache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.io.File;
 
+import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
-
 import android.util.Log;
+import android.net.Uri;
 
 @ReactModule(name = BlastedImageModule.NAME)
 public class BlastedImageModule extends ReactContextBaseJavaModule {
     public static final String NAME = "BlastedImage";
-
-    private void sendEvent(ReactContext reactContext, String eventName, String message) {
-        WritableMap params = Arguments.createMap();
-        params.putString("message", "["+NAME+"] "+message);
-        reactContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit(eventName, params);
-    }
-
     private final ReactApplicationContext mReactContext;
 
-    public BlastedImageModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        this.mReactContext = reactContext;
-    }
+    private static boolean isGlideInitialized = false;
 
     @Override
     @NonNull
@@ -66,35 +57,90 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
         // Do nothing
     }
 
+    public BlastedImageModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+        this.mReactContext = reactContext;
+
+        if (!isGlideInitialized) {
+            Glide.init(reactContext, new GlideBuilder()
+                .setDiskCache(new InternalCacheDiskCacheFactory(reactContext, 1024 * 1024 * 1024)) //1gb disk cache
+                .setMemoryCache(new LruResourceCache(100 * 1024 * 1024)) // 100mb memory cache
+            );
+            isGlideInitialized = true;
+        }        
+    }
+
+    private void sendEvent(ReactContext reactContext, String eventName, String message) {
+        WritableMap params = Arguments.createMap();
+        params.putString("message", "["+NAME+"] "+message);
+        reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
+    }
+
+    public String extractImagePathFromUrl(String imageUrl, String cloudUrl) {
+        String imagePath = imageUrl.replace(cloudUrl, "");
+        imagePath = imagePath.split("\\?alt=media")[0];
+
+        imagePath = imagePath.replace("%2F", "/");
+
+        return "blasted-image/" + imagePath;
+    }    
+
+    public boolean doesFileExistInAssets(String filePath) {
+        AssetManager assetManager = mReactContext.getAssets();
+        try {
+            assetManager.open(filePath);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Object prepareGlideUrl(String imageUrl, boolean hybridAssets, String cloudUrl, boolean showLog) throws Exception {
+        String imagePath = "";
+        Object glideUrl; 
+        boolean fileExistsInAssets = false;
+
+        if (hybridAssets){
+            imagePath = extractImagePathFromUrl(imageUrl, cloudUrl);
+            fileExistsInAssets = doesFileExistInAssets(imagePath);
+        }
+
+        if (fileExistsInAssets && hybridAssets) {
+            if (showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Image is in local assets. Local url: " + imagePath);
+            glideUrl = Uri.parse("file:///android_asset/" + imagePath);
+            if (showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Glide Url: " + glideUrl.toString());
+        } else {
+            if (hybridAssets){
+                if (showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Image is not in local assets (Use URL). Local url: " + imagePath + ". Remote url: " + imageUrl);
+            } else {
+                if (showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Local assets disabled. Use remote url: " + imageUrl);
+            }
+
+            glideUrl = new GlideUrl(imageUrl);
+        }
+
+        return glideUrl;
+    }
+
     // Show/Preload the image
     @ReactMethod
-    public void loadImage(String imageUrl, ReadableMap headersMap, boolean skipMemoryCache, Promise promise) {
-        try {
-            GlideUrl glideUrl;
-            if (headersMap != null && !headersMap.toHashMap().isEmpty()) {
-                HashMap<String, Object> tempHeaders = headersMap.toHashMap();
-                HashMap<String, String> headers = new HashMap<>();
+    public void loadImage(String imageUrl, boolean skipMemoryCache, boolean hybridAssets, String cloudUrl, Promise promise) {
 
-                for (Map.Entry<String, Object> entry : tempHeaders.entrySet()) {
-                    headers.put(entry.getKey(), String.valueOf(entry.getValue()));
-                }
-                
-                LazyHeaders.Builder headersBuilder = new LazyHeaders.Builder();
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    headersBuilder.addHeader(entry.getKey(), entry.getValue());
-                }
-                glideUrl = new GlideUrl(imageUrl, headersBuilder.build());
-            } else {
-                glideUrl = new GlideUrl(imageUrl);
-            }
+        try {
+            Object glideUrl = prepareGlideUrl(imageUrl, hybridAssets, cloudUrl, true);
 
             // Is skip skipMemoryCache set for image and should we store it only to disk?
             RequestOptions requestOptions = new RequestOptions();
             if (skipMemoryCache) {
                 requestOptions = requestOptions.skipMemoryCache(true);
+                Log.d("BlastedImageModule", "Skip memory cache");
+            } else {
+                Log.d("BlastedImageModule", "Memory cache image");
             }
 
-            Glide.with(getReactApplicationContext())
+            Glide.with(getCurrentActivity() != null ? getCurrentActivity() : getReactApplicationContext())
                 .load(glideUrl)
                 .apply(requestOptions)
                 .listener(new RequestListener<Drawable>() {
@@ -110,6 +156,8 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
                         
                         if (dataSource == com.bumptech.glide.load.DataSource.MEMORY_CACHE) {
                             message = "(MEMORY) " + model.toString();
+                        } else if (model.toString().startsWith("file:///android_asset/")) {
+                            message = "(LOCAL) " + model.toString();
                         } else if (dataSource == com.bumptech.glide.load.DataSource.DATA_DISK_CACHE || dataSource == com.bumptech.glide.load.DataSource.RESOURCE_DISK_CACHE) {
                             message = "(DISK) " + model.toString();
                         } else {
@@ -117,7 +165,6 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
                         }
 
                         sendEvent(getReactApplicationContext(), "BlastedEventLoaded", message);
-
                         promise.resolve(true);
                         
                         return false;

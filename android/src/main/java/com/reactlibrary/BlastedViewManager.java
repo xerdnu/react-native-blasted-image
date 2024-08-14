@@ -4,6 +4,7 @@ import com.bumptech.glide.Glide;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.bridge.ReactApplicationContext;
 
 import android.widget.ImageView;
 import android.view.View;
@@ -21,6 +22,9 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
 
     public static final String REACT_CLASS = "BlastedImageView";
 
+    private boolean hybridAssets = false;
+    private String cloudUrl = "";
+
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -28,18 +32,46 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
 
     @Override
     protected ImageView createViewInstance(ThemedReactContext reactContext) {
+        Log.d("BlastedViewManager", "BlastedImageView instance created");
         return new ImageView(reactContext);
+    }
+
+    @ReactProp(name = "hybridAssets")
+    public void setHybridAssets(ImageView view, boolean hybridAssets) {
+        this.hybridAssets = hybridAssets;
+        Log.d("BlastedViewManager", "hybridAssets value: " + hybridAssets);
+    }
+
+    @ReactProp(name = "cloudUrl")
+    public void setCloudUrl(ImageView view, String cloudUrl) {
+        this.cloudUrl = cloudUrl;
+        Log.d("BlastedViewManager", "cloudUrl value: " + cloudUrl);
     }
 
     @ReactProp(name = "sourceUri")
     public void setSourceUri(ImageView view, String sourceUri) {
-        if (sourceUri != null && !sourceUri.isEmpty()) {
-            Glide.with(view.getContext())
-                .load(sourceUri)
-                .into(view);
-            view.setVisibility(View.VISIBLE);  // SourceUri is valid so show ImageView
-        } else {
-            view.setVisibility(View.INVISIBLE);  // Hide the ImageView
+        Log.d("BlastedViewManager", "sourceUri value: " + sourceUri);
+
+        try {
+            ThemedReactContext themedReactContext = (ThemedReactContext) view.getContext();
+            ReactApplicationContext reactContext = (ReactApplicationContext) themedReactContext.getReactApplicationContext();
+            BlastedImageModule blastedImageModule = new BlastedImageModule(reactContext);
+
+            Object glideUrl = blastedImageModule.prepareGlideUrl(sourceUri, hybridAssets, cloudUrl, false);
+
+            Log.d("BlastedViewManager", "glideUrl value: " + glideUrl.toString());
+
+            if (glideUrl != null && !glideUrl.toString().isEmpty()) {
+                Glide.with(reactContext.getCurrentActivity() != null ? reactContext.getCurrentActivity() : view.getContext())
+                    .load(glideUrl)
+                    .into(view);
+                view.setVisibility(View.VISIBLE);  // glideUrl is valid so show ImageView
+            } else {
+                view.setVisibility(View.INVISIBLE);  // Hide the ImageView
+            }
+        } catch (Exception e) {
+            Log.e("BlastedViewManager", "Error setting glideUrl: " + e.getMessage());
+            view.setVisibility(View.INVISIBLE); // Hide the ImageView
         }
     }
 

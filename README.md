@@ -6,7 +6,7 @@
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
 ## Description
-Caching remote images has always been a challenge for me with the Image component in React Native. This simplified, yet powerful component, addresses that issue head-on. It offers a robust and performant mechanism for caching remote images, ensuring they're displayed quickly.<br><br>Leveraging the strengths of Glide and SDWebImage, it supports both memory and disk caching for remote images. Notably, while it provides these enhanced capabilities for remote images, it seamlessly integrates with the standard React Native Image component when handling local assets.
+Caching remote images has always been a challenge for me with the Image component in React Native. This simplified, yet powerful component, addresses that issue head-on. It offers a robust and performant mechanism for caching remote images, ensuring they're displayed quickly.<br><br>Leveraging the strengths of Glide and SDWebImage, it supports both memory and disk caching for remote images. The newly added Hybrid Assets feature allows you to bundle remote assets in your build, fetching from the network only when necessary. Notably, while it provides these enhanced capabilities for remote images, it seamlessly integrates with the standard React Native Image component when handling local assets using require.
 
 ## Features
 
@@ -14,8 +14,10 @@ Caching remote images has always been a challenge for me with the Image componen
 - **Cross-Platform**: Works on both Android (with [Glide](https://github.com/bumptech/glide)) and iOS (with [SDWebImage](https://github.com/SDWebImage/SDWebImage))
 - **Customizable**: Wrapped within a `View` for added layout and style customization.
 - **Robust Caching**: Benefits from both memory and disk caching for maximum performance.
+- **Hybrid Assets**: Bundle remote assets within your build and only fetch from the network if assets are not included.
 
 ## Installation
+### With bare React Native 
 #### Using npm:
 ```bash
 npm install react-native-blasted-image --save
@@ -27,6 +29,12 @@ yarn add react-native-blasted-image
 #### Link native packages (iOS only)
 ```bash
 cd ios && pod install
+```
+
+### With Expo
+#### Using npm:
+```bash
+npx expo install react-native-blasted-image
 ```
 
 ## Usage
@@ -54,7 +62,9 @@ import BlastedImage from 'react-native-blasted-image';
 | `fallbackSource` | `Object`          | (Optional) Object containing a `uri` string for a custom error image.  | - |
 | `onLoad` | `Function`          | (Optional) Callback function that gets called when the image has loaded succesfully.  | - |
 | `onError` | `Function`          | (Optional) Callback function that gets called when there was an error loading the image.  | - |
-| `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.                            | -       |
+| `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.       
+| `hybridassets` | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.  | false |
+| `cloudUrl`      | `String`          | (Required if hybridassets is enabled) Leading URL to the remote assets for Hybrid Assets functionality.                     | -       |
 
 ## Methods
 ```jsx
@@ -71,6 +81,60 @@ BlastedImage.preload([
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |
+
+## Hybrid Assets
+The Hybrid Assets feature allows you to bundle remote assets directly into your build ensuring they are available locally while still enabling network fetching when necessary. This approach can significantly reduce bandwidth usage especially if you know in advance which assets will be used when you bundle your app.<br><br>To fully utilize the Hybrid Assets feature it's important to follow the same folder structure remotely as you do locally. This makes it easier to update your project with new assets while keeping everything organized and simplify the process of integrating updates.
+
+### Automatic Bundling (Expo only)
+When using Expo you can take advantage of the automatic asset bundling feature by adding this to your app.json file and running prebuild. The bundling feature will automatically copy and reference hybrid assets from the `./assets/blasted-image/*` directory on both iOS and Android platforms following the same folder structure as your remote assets
+
+#### app.json
+```json
+{
+  "expo": {
+    "plugins": [
+      "react-native-blasted-image"
+    ]
+  }
+}
+```
+#### Run
+```bash
+npx expo prebuild
+```
+
+### Manual Bundling
+If you prefer to manage your hybrid assets manually or if you are using `Bare React Native` you need to do the following.
+
+#### Android
+1. Copy your hybrid assets to ./android/app/src/main/assets/blasted-image/
+
+#### iOS
+1. Copy your hybrid assets to ./ios/Resources/blasted-image/
+2. Reference your hybrid asset folder in Xcode (Resources -> blasted-image) and make sure it is included in the Build Phase.
+
+### Hybrid Assets Example Structure
+```
+Local files                         # Files included in your build
+│
+├── assets                          # Inside root directory of your project
+│   │
+│   ├── blasted-image               # All images in this folder are checked against the matching location on your cloud storage.
+│   │
+│   ├────── image_or_folder_1	 
+│   ├────── image_or_folder_2        
+│   └────── ...    
+└── ...
+	
+Remote files                        # Files in the cloud, for example Firebase etc.
+│
+├── image_or_folder_1               # Available in hybrid assets, not downloaded
+├── image_or_folder_2               # Available in hybrid assets, not downloaded
+├── image_or_folder_2               # Not available in hybrid assets, download and cache
+└── ...
+```
+> **Note**: If you use manual bundling your hybrid assets should not be placed inside the root of your project directory but rather in Resources for iOS and assets for Android.
+
 
 ## Events
 ```jsx
@@ -94,6 +158,7 @@ useEffect(() => {
 | `BlastedEventClearedMemory` | Triggered when the memory cache for all images is cleared.                    |
 | `BlastedEventClearedDisk`| Triggered when the disk cache for all images is cleared.                  |
 | `BlastedEventClearedAll` | Triggered when both disk and memory caches for all images are cleared.       |
+| `BlastedEventLog` | Provides detailed logging information for better debugging.       |
 
 ## Credits
 This component was created with inspiration from [react-native-fast-image](https://github.com/DylanVann/react-native-fast-image) that also uses [Glide](https://github.com/bumptech/glide) and [SDWebImage](https://github.com/SDWebImage/SDWebImage). But due to its lack of ongoing maintenance i felt the need to develop this new image component to continue providing robust and performant caching functionality.

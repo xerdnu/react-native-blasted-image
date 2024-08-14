@@ -5,16 +5,29 @@
 
 @implementation BlastedImageModule
 {
-    BOOL hasListeners; // Check if any listeners (ios specific)
+    BOOL hasListeners;
 }
 
 RCT_EXPORT_MODULE(BlastedImage);
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        SDImageCacheConfig *cacheConfig = [SDImageCache sharedImageCache].config;
+        cacheConfig.maxDiskSize = 1024 * 1024 * 1024; // 1GB
+        cacheConfig.maxDiskAge = NSIntegerMax; // No max time for disk cache
+        cacheConfig.maxMemoryCost = 100 * 1024 * 1024; // 100MB memory cache
+    }
+    return self;
+}
+
 - (NSArray<NSString *> *)supportedEvents {
     return @[@"BlastedEventLoaded", 
-             @"BlastedEventClearedMemory",
-             @"BlastedEventClearedDisk",
-             @"BlastedEventClearedAll"];
+            @"BlastedEventClearedMemory",
+            @"BlastedEventClearedDisk",
+            @"BlastedEventClearedAll",
+            @"BlastedEventLog"
+            ];
 }
 
 - (void)startObserving {
@@ -27,20 +40,78 @@ RCT_EXPORT_MODULE(BlastedImage);
 
 - (void)sendEventWithName:(NSString *)name message:(NSString *)message {
     if (hasListeners) {
-        [self sendEventWithName:name body:@{@"message": [[NSString alloc] initWithFormat:@"[BlastedImage] %@", message]}];
+        NSString *formattedMessage = [NSString stringWithFormat:@"[BlastedImage] %@", message];
+        [self sendEventWithName:name body:@{@"message": formattedMessage}];
     }
 }
 
-RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl headers:(NSDictionary *)headers skipMemoryCache:(BOOL)skipMemoryCache resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    NSURL *url = [NSURL URLWithString:imageUrl];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    
-    // Convert headers
-    if (headers) {
-        for (NSString *key in headers) {
-            [request setValue:[RCTConvert NSString:headers[key]] forHTTPHeaderField:key];
-        }
+- (NSString *)extractImagePathFromUrl:(NSString *)imageUrl cloudUrl:(NSString *)cloudUrl {
+    NSString *imagePath = [imageUrl stringByReplacingOccurrencesOfString:cloudUrl withString:@""];
+    NSRange range = [imagePath rangeOfString:@"?alt=media"];
+    if (range.location != NSNotFound) {
+        imagePath = [imagePath substringToIndex:range.location];
     }
+    imagePath = [imagePath stringByReplacingOccurrencesOfString:@"%2F" withString:@"/"];
+    return [NSString stringWithFormat:@"blasted-image/%@", imagePath];
+}
+
+- (BOOL)doesFileExistInAssets:(NSString *)filePath {
+    NSString *resourcePath = [[NSBundle mainBundle] pathForResource:filePath ofType:nil];
+    BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:resourcePath];
+
+    return fileExists;
+}
+
+- (NSURL *)prepareUrl:(NSString *)imageUrl
+        hybridAssets:(BOOL)hybridAssets
+            cloudUrl:(NSString *)cloudUrl
+             showLog:(BOOL)showLog {
+    
+    NSString *imagePath = @"";
+    NSURL *url;
+    BOOL fileExistsInAssets = NO;
+
+    if (hybridAssets) {
+        imagePath = [self extractImagePathFromUrl:imageUrl cloudUrl:cloudUrl];
+        fileExistsInAssets = [self doesFileExistInAssets:imagePath];
+    }
+
+    if (fileExistsInAssets && hybridAssets) {
+        if (showLog) {
+            [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Image is in local assets. Local url: %@", imagePath]];
+
+        }
+
+        url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:imagePath ofType:nil]];
+
+        if (showLog) {
+            [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Url:  %@", url.absoluteString]];                               
+        }
+    } else {
+        if (hybridAssets) {
+            if (showLog) {
+                [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Image is not in local assets (Use URL). Local url: %@. Remote url: %@", imagePath, imageUrl]];    
+            }
+        } else {
+            if (showLog) {
+                [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Local assets disabled. Use remote url: %@", imageUrl]]; 
+            }
+        }
+
+        url = [NSURL URLWithString:imageUrl];
+    }
+
+    return url;
+}
+
+RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl 
+                skipMemoryCache:(BOOL)skipMemoryCache 
+                hybridAssets:(BOOL)hybridAssets 
+                cloudUrl:(NSString *)cloudUrl                 
+                resolver:(RCTPromiseResolveBlock)resolve 
+                rejecter:(RCTPromiseRejectBlock)reject) {
+
+    NSURL *url = [self prepareUrl:imageUrl hybridAssets:hybridAssets cloudUrl:cloudUrl showLog:YES];
 
     // Is skip skipMemoryCache set for image and should we store it only to disk?
     SDWebImageOptions options = 0;
@@ -61,16 +132,14 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl headers:(NSDictionary *)headers
             }
 
             NSString *message;
-            switch (cacheType) {
-                case SDImageCacheTypeMemory:
-                    message = [NSString stringWithFormat:@"(MEMORY) %@", imageURL];
-                    break;
-                case SDImageCacheTypeDisk:
-                    message = [NSString stringWithFormat:@"(DISK) %@", imageURL];
-                    break;
-                default:
-                    message = [NSString stringWithFormat:@"(NETWORK) %@", imageURL];
-                    break;
+            if (cacheType == SDImageCacheTypeMemory) {
+                message = [NSString stringWithFormat:@"(MEMORY) %@", imageURL];
+            } else if ([imageURL isFileURL]) {
+                message = [NSString stringWithFormat:@"(LOCAL) %@", imageURL];
+            } else if (cacheType == SDImageCacheTypeDisk) {
+                message = [NSString stringWithFormat:@"(DISK) %@", imageURL];
+            } else {
+                message = [NSString stringWithFormat:@"(NETWORK) %@", imageURL];
             }
             
             [self sendEventWithName:@"BlastedEventLoaded" message:message];

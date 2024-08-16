@@ -54,7 +54,7 @@ import BlastedImage from 'react-native-blasted-image';
 ## Paramaters
 | Parameter    | Type              | Description                                                                                         | Default |
 |--------------|-------------------|-----------------------------------------------------------------------------------------------------|---------|
-| `source`     | `Object`&nbsp;or&nbsp;`require` | (**Required**) Can be an object containing a `uri` string for remote images or local images using `require`.     | -       |
+| `source`     | `Object`&nbsp;or&nbsp;`require` | (**Required**) Can be an object containing a `uri` string for remote images or local images using `require`.<br><br>(Optional) The object containing `uri` can also contain `hybridAssets` and `cloudUrl` . See specific documentation regarding the source parameter below.     | -       |
 | `width`      | `Number`          | (Optional) Specifies the width of the image. `Overrides width in style`                                                        | 100     |
 | `height`     | `Number`          | (Optional) Specifies the height of the image. `Overrides height in style`                                                      | 100     |
 | `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover`&nbsp;`contain`&nbsp;`center`&nbsp;`stretch`  | cover |
@@ -63,8 +63,12 @@ import BlastedImage from 'react-native-blasted-image';
 | `onLoad` | `Function`          | (Optional) Callback function that gets called when the image has loaded succesfully.  | - |
 | `onError` | `Function`          | (Optional) Callback function that gets called when there was an error loading the image.  | - |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.       
-| `hybridassets` | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.  | false |
-| `cloudUrl`      | `String`          | (Required if hybridassets is enabled) Leading URL to the remote assets for Hybrid Assets functionality.                     | -       |
+### Source Parameter
+| Parameter    | Type              | Description                                                                                         | Default |
+|--------------|-------------------|-----------------------------------------------------------------------------------------------------|---------|
+| `uri`     | `String` | (**Required**) URI string for remote images or local images using require.     | -       |
+| `hybridAssets`      | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.                                                        | false     |
+| `cloudUrl`     | `String`          | (Optional) Leading URL to the remote assets for Hybrid Assets functionality.<br>(Required if `hybridAssets` is enabled)                                                       | null     |
 
 ## Methods
 ```jsx
@@ -73,11 +77,12 @@ import BlastedImage from 'react-native-blasted-image';
 BlastedImage.preload([
   { uri: 'https://example.com/image1.jpg' },
   { uri: 'https://example.com/image2.jpg', skipMemoryCache: true },
+  { uri: 'https://example.com/image2.jpg', skipMemoryCache: true, hybridAssets: true, cloudUrl: "https://www.example.com/" }
 ]);
 ```
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.                   |
+| `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.<br>`Supports Hybrid Assets`                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |

@@ -5,6 +5,7 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 
 import android.widget.ImageView;
 import android.view.View;
@@ -22,9 +23,6 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
 
     public static final String REACT_CLASS = "BlastedImageView";
 
-    private boolean hybridAssets = false;
-    private String cloudUrl = "";
-
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -36,28 +34,25 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
         return new ImageView(reactContext);
     }
 
-    @ReactProp(name = "hybridAssets")
-    public void setHybridAssets(ImageView view, boolean hybridAssets) {
-        this.hybridAssets = hybridAssets;
-        Log.d("BlastedViewManager", "hybridAssets value: " + hybridAssets);
-    }
-
-    @ReactProp(name = "cloudUrl")
-    public void setCloudUrl(ImageView view, String cloudUrl) {
-        this.cloudUrl = cloudUrl;
-        Log.d("BlastedViewManager", "cloudUrl value: " + cloudUrl);
-    }
-
-    @ReactProp(name = "sourceUri")
-    public void setSourceUri(ImageView view, String sourceUri) {
-        Log.d("BlastedViewManager", "sourceUri value: " + sourceUri);
+    @ReactProp(name = "source")
+    public void setSource(ImageView view, ReadableMap source) {
+        if (source == null) {
+            Log.e("BlastedViewManager", "Source is null");
+            return;
+        }
+        
+        Log.d("BlastedViewManager", "source value: " + source);
 
         try {
+            String uri = source.hasKey("uri") ? source.getString("uri") : null;
+            boolean hybridAssets = source.hasKey("hybridAssets") && source.getBoolean("hybridAssets");
+            String cloudUrl = source.hasKey("cloudUrl") ? source.getString("cloudUrl") : null;
+            
             ThemedReactContext themedReactContext = (ThemedReactContext) view.getContext();
             ReactApplicationContext reactContext = (ReactApplicationContext) themedReactContext.getReactApplicationContext();
             BlastedImageModule blastedImageModule = new BlastedImageModule(reactContext);
 
-            Object glideUrl = blastedImageModule.prepareGlideUrl(sourceUri, hybridAssets, cloudUrl, false);
+            Object glideUrl = blastedImageModule.prepareGlideUrl(uri, hybridAssets, cloudUrl, false); // false = Dont show logs when not preload
 
             Log.d("BlastedViewManager", "glideUrl value: " + glideUrl.toString());
 

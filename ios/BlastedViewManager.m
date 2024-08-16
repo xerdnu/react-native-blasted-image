@@ -4,10 +4,7 @@
 #import <React/RCTConvert.h>
 #import <SDWebImage/SDWebImage.h>
 
-@implementation BlastedViewManager {
-    BOOL _hybridAssets;
-    NSString *_cloudUrl;
-}
+@implementation BlastedViewManager
 
 RCT_EXPORT_MODULE(BlastedImageView);
 
@@ -20,18 +17,19 @@ RCT_EXPORT_MODULE(BlastedImageView);
     return (!str || ![str isKindOfClass:[NSString class]] || [str isEqualToString:@""]);
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(hybridAssets, BOOL, UIImageView) {
-    _hybridAssets = [RCTConvert BOOL:json];
-}
+RCT_CUSTOM_VIEW_PROPERTY(source, NSString, UIImageView) {
 
-RCT_CUSTOM_VIEW_PROPERTY(cloudUrl, NSString, UIImageView) {
-    _cloudUrl = [RCTConvert NSString:json];
-}
+    if ([self isEmptyString:json]) {
+        [view setHidden:YES];
+        return;
+    }
 
-RCT_CUSTOM_VIEW_PROPERTY(sourceUri, NSString, UIImageView) {
-    NSString *uri = [RCTConvert NSString:json]; 
+    NSString *uri = [RCTConvert NSString:json[@"uri"]];
+    BOOL hybridAssets = [RCTConvert BOOL:json[@"hybridAssets"]];
+    NSString *cloudUrl = [RCTConvert NSString:json[@"cloudUrl"]];
+
     BlastedImageModule *blastedImageModule = [[BlastedImageModule alloc] init];
-    NSURL *url = [blastedImageModule prepareUrl:uri hybridAssets:_hybridAssets cloudUrl:_cloudUrl showLog:NO];
+    NSURL *url = [blastedImageModule prepareUrl:uri hybridAssets:hybridAssets cloudUrl:cloudUrl showLog:NO];
     
     if (url != nil && ![url.absoluteString isEqualToString:@""]) {
         [view sd_setImageWithURL:url];

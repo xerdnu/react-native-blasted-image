@@ -1,3 +1,18 @@
+## [1.0.1] (2024-08-15)
+
+#### Improvements
+
+-   Reworked the `source` parameter.
+-   Reworked some code to create stability regarding the Hybrid Assets.
+
+#### Changes
+-   Updated TypeScript definitions.
+-   Updated documentation.
+
+#### Bug Fixes
+-   Fixed a bug where the component would crash due to incorrect `hybridAssets` parameter.
+-   Fixed a bug where changing the parameter for `hyberAssets` would not take effect.
+
 ## [1.0.0] (2024-08-14)
 
 #### New Features
@@ -145,6 +160,7 @@
 
 -   Initial release.
 
+[1.0.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.13...v1.0.0
 [0.0.13]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.11...v0.0.12

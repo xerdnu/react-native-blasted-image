@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect/*, useRef*/ } from 'react';
 import { requireNativeComponent, NativeModules, Platform, Image, View } from 'react-native';
 
 const LINKING_ERROR =
@@ -15,7 +15,7 @@ const NativeBlastedImage = NativeModules.BlastedImage
 		throw new Error(LINKING_ERROR);
 		},
 	}
-  );
+);
 
 export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null) => {
 
@@ -37,9 +37,7 @@ const BlastedImage = ({
 	resizeMode = "cover",
 	isBackground = false,
 	fallbackSource = null,
-	hybridAssets = false,
-	cloudUrl = null,
-	source, 
+	source,
 	width, 
 	onLoad, 
 	onError, 
@@ -48,6 +46,20 @@ const BlastedImage = ({
 	children 
 }) => {
 	const [error, setError] = useState(false);
+	
+	if (typeof source === 'object') {
+		source = {
+			uri: '',
+			hybridAssets: false,
+			cloudUrl: null,
+			...source
+		};
+
+		if (source.hybridAssets && source.cloudUrl === null) {
+			console.error("When using hybridAssets, you must specify a cloudUrl prop. This is the base URL where the local assets are hosted.");
+			source.hybridAssets = false;
+		}
+	}
 
 	if (!source || (!source.uri && typeof source !== 'number')) {
 		if (!source) {
@@ -66,7 +78,7 @@ const BlastedImage = ({
 		const fetchImage = async () => {
 		try {
 			setError(false);
-			await loadImage(source.uri, false, hybridAssets, cloudUrl);
+			await loadImage(source.uri, false, source.hybridAssets, source.cloudUrl);
 			onLoad?.();
 		} catch (err) {
 			setError(true);
@@ -74,7 +86,7 @@ const BlastedImage = ({
 			onError?.(err);
 		}
 		};
-
+		
 		fetchImage();
 	}, [source]);
 
@@ -136,17 +148,17 @@ const BlastedImage = ({
 	  <View style={!isBackground ? viewStyle : null}>
 		{isBackground ? (
 		  <View style={viewStyle}>
-			{renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode, hybridAssets, cloudUrl)}
+			{renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)}
 		  </View>
 		) : (
-		  renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode, hybridAssets, cloudUrl)
+		  renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)
 		)}
 		{isBackground && <View style={childrenStyle}>{children}</View>}
 	  </View>
 	);
 };
 
-function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode, hybridAssets, cloudUrl) {
+function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode) {
 	if (error) {
 		if (fallbackSource) { // Error - Fallback specified, use native component
 			return (
@@ -176,12 +188,10 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 	} else { // Success - with remote asset
 		return (
 			<BlastedImageView
-				sourceUri={source.uri}
+				source={source}
 				width={adjustedWidth}
 				height={adjustedHeight}
 				resizeMode={resizeMode}
-				hybridAssets={hybridAssets}
-				cloudUrl={cloudUrl}
 			/>
 		);
 	}

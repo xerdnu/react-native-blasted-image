@@ -1,3 +1,9 @@
+## [1.0.2] (2024-08-16)
+
+#### Bug Fixes
+
+-   Fixed a bug where images was not sent into view on iOS.
+
 ## [1.0.1] (2024-08-16)
 
 #### Improvements

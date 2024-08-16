@@ -2,6 +2,8 @@
 #import "BlastedImageModule.h"
 #import <React/RCTViewManager.h>
 #import <React/RCTConvert.h>
+#import <React/RCTBridge.h>
+#import <React/RCTBridgeModule.h>
 #import <SDWebImage/SDWebImage.h>
 
 @implementation BlastedViewManager
@@ -17,9 +19,12 @@ RCT_EXPORT_MODULE(BlastedImageView);
     return (!str || ![str isKindOfClass:[NSString class]] || [str isEqualToString:@""]);
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(source, NSString, UIImageView) {
+RCT_CUSTOM_VIEW_PROPERTY(source, NSDictionary, UIImageView) {
 
-    if ([self isEmptyString:json]) {
+    BlastedImageModule *blastedImageModule = [self.bridge moduleForClass:[BlastedImageModule class]];
+
+    if ([self isEmptyString:json[@"uri"]]) {
+        [blastedImageModule sendEventWithName:@"BlastedEventLog" message:@"Source is empty"]; 
         [view setHidden:YES];
         return;
     }
@@ -28,9 +33,8 @@ RCT_CUSTOM_VIEW_PROPERTY(source, NSString, UIImageView) {
     BOOL hybridAssets = [RCTConvert BOOL:json[@"hybridAssets"]];
     NSString *cloudUrl = [RCTConvert NSString:json[@"cloudUrl"]];
 
-    BlastedImageModule *blastedImageModule = [[BlastedImageModule alloc] init];
     NSURL *url = [blastedImageModule prepareUrl:uri hybridAssets:hybridAssets cloudUrl:cloudUrl showLog:NO];
-    
+
     if (url != nil && ![url.absoluteString isEqualToString:@""]) {
         [view sd_setImageWithURL:url];
         [view setHidden:NO];

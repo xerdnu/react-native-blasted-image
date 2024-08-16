@@ -82,7 +82,7 @@ BlastedImage.preload([
 ```
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.<br>`Supports Hybrid Assets`                   |
+| `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool, hybridAssets: bool, cloudUrl: string }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |

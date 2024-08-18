@@ -71,7 +71,7 @@ const BlastedImage = ({
 	}
 
 	useEffect(() => {
-		if (typeof source === 'number') {
+		if (typeof source === 'number' || error) {
 			return;
 		}
 
@@ -88,7 +88,7 @@ const BlastedImage = ({
 		};
 		
 		fetchImage();
-	}, [source]);
+	}, [source, error]);
 
 	// Flatten styles if provided as an array, otherwise use style as-is
 	const flattenedStyle = Array.isArray(style) ? Object.assign({}, ...style) : style;

@@ -1,3 +1,9 @@
+## [1.0.3] (2024-08-18)
+
+#### Bug Fixes
+
+-   Fixed a bug that caused an infinite loading loop when an image failed to load.
+
 ## [1.0.2] (2024-08-16)
 
 #### Bug Fixes
@@ -166,6 +172,8 @@
 
 -   Initial release.
 
+[1.0.3]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.13...v1.0.0
 [0.0.13]: https://github.com/xerdnu/react-native-blasted-image/compare/v0.0.12...v0.0.13

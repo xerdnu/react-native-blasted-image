@@ -1,3 +1,13 @@
+## [1.0.4] (2024-09-20)
+
+#### Improvements
+
+-   Added `assetsPath` parameter to be specified in app.json.
+
+#### Changes
+
+-   Updated documentation.
+
 ## [1.0.3] (2024-08-18)
 
 #### Bug Fixes
@@ -172,6 +182,7 @@
 
 -   Initial release.
 
+[1.0.4]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.0...v1.0.1

@@ -91,14 +91,17 @@ BlastedImage.preload([
 The Hybrid Assets feature allows you to bundle remote assets directly into your build ensuring they are available locally while still enabling network fetching when necessary. This approach can significantly reduce bandwidth usage especially if you know in advance which assets will be used when you bundle your app.<br><br>To fully utilize the Hybrid Assets feature it's important to follow the same folder structure remotely as you do locally. This makes it easier to update your project with new assets while keeping everything organized and simplify the process of integrating updates.
 
 ### Automatic Bundling (Expo only)
-When using Expo you can take advantage of the automatic asset bundling feature by adding this to your app.json file and running prebuild. The bundling feature will automatically copy and reference hybrid assets from the `./assets/blasted-image/*` directory on both iOS and Android platforms following the same folder structure as your remote assets
+When using Expo you can take advantage of the automatic asset bundling feature by adding this to your app.json file and running prebuild. The bundling feature will automatically copy and reference hybrid assets from the `./assets/blasted-image/*` directory on both iOS and Android platforms following the same folder structure as your remote assets.
 
 #### app.json
 ```json
 {
   "expo": {
     "plugins": [
-      "react-native-blasted-image"
+      "react-native-blasted-image",
+      {
+        "assetsPath": "/project-root/assets/blasted-image" // optional (not required)
+      }
     ]
   }
 }

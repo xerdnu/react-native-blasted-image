@@ -17,7 +17,7 @@ function copyAssets(srcDir, destDir, platform) {
   }
 }
 
-const blastedAssets = (config) => {
+const blastedAssets = (config, options = {}) => {
   config = withDangerousMod(config, [
     'android',
     (config) => {
@@ -29,7 +29,7 @@ const blastedAssets = (config) => {
         'assets',
         'blasted-image'
       );
-      const absoluteSrcPath = path.resolve('assets', 'blasted-image');
+      const absoluteSrcPath = path.resolve(options.assetsPath || './assets/blasted-image');
       copyAssets(absoluteSrcPath, androidDir, 'Android');
       return config;
     },

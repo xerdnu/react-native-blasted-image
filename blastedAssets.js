@@ -29,7 +29,7 @@ const blastedAssets = (config, options = {}) => {
         'assets',
         'blasted-image'
       );
-      const absoluteSrcPath = path.resolve(options.assetsPath || './assets/blasted-image');
+      const absoluteSrcPath = path.resolve(options.assetsPath || process.env.ASSETS_PATH || './assets/blasted-image');
       copyAssets(absoluteSrcPath, androidDir, 'Android');
       return config;
     },

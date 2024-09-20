@@ -106,6 +106,7 @@ When using Expo you can take advantage of the automatic asset bundling feature b
   }
 }
 ```
+> **Note**: The `assetsPath` property is optional. By default, it will use the path `./assets/blasted-image`
 #### Run
 ```bash
 npx expo prebuild

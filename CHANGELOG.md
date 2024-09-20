@@ -1,3 +1,9 @@
+## [1.0.5] (2024-09-20)
+
+#### Improvements
+
+-   Added `ASSETS_PATH` environment variable to support EAS.
+
 ## [1.0.4] (2024-09-20)
 
 #### Improvements

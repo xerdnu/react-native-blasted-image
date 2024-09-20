@@ -100,12 +100,13 @@ When using Expo you can take advantage of the automatic asset bundling feature b
     "plugins": [
       "react-native-blasted-image",
       {
-        "assetsPath": "/project-root/assets/blasted-image" // optional (not required)
+        "assetsPath": "/project-root/assets/blasted-image"
       }
     ]
   }
 }
 ```
+> **Note**: The `assetsPath` property is optional and does not need to be specified. By default, it will use the path `./assets/blasted-image`
 #### Run
 ```bash
 npx expo prebuild

@@ -35,12 +35,13 @@ const blastedAssets = (config, options = {}) => {
     },
   ]);
 
-  config = withXcodeProject(config, async (config) => {
+  config = withXcodeProject(config, async (config, options = {}) => {
     const { projectRoot } = config.modRequest;
     const iosDir = path.join(projectRoot, 'ios');
     const resourcesDir = path.join(iosDir, 'Resources');
     const blastedImageDir = path.join(resourcesDir, 'blasted-image');
-    const absoluteSrcPath = path.resolve('assets', 'blasted-image');
+    //const absoluteSrcPath = path.resolve('assets', 'blasted-image');
+    const absoluteSrcPath = path.resolve(options.assetsPath || process.env.ASSETS_PATH || './assets/blasted-image');
 
     fs.ensureDirSync(resourcesDir);
 

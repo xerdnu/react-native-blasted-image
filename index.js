@@ -71,7 +71,7 @@ const BlastedImage = ({
 	}
 
 	useEffect(() => {
-		if (typeof source === 'number' || error) {
+		if (typeof source === 'number' || (typeof source === 'object' && source.uri && source.uri.startsWith('file://')) || error) {
 			return;
 		}
 
@@ -177,7 +177,7 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 				/>
 			);
 		}
-	} else if (typeof source === 'number') { // Success - with local asset
+	} else if (typeof source === 'number') { // Success - with local asset (require), no need to use cache
 		return (
 			<Image
 				source={source}
@@ -185,7 +185,15 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 				resizeMode={resizeMode}
 			/>
 		);
-	} else { // Success - with remote asset
+	} else if (typeof source === 'object' && source.uri && source.uri.startsWith('file://')) { // Success - with local asset (file://android_asset), no need to use cache
+		return (
+			<Image
+				source={{ uri: source.uri }}
+				style={{ width: adjustedWidth, height: adjustedHeight }}
+				resizeMode={resizeMode}
+			/>
+		);
+	} else { // Success - with remote asset (http/https), use native component with full cache support
 		return (
 			<BlastedImageView
 				source={source}

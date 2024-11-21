@@ -7,57 +7,48 @@ const LINKING_ERROR =
 	'- You rebuilt the app after installing the package';
 
 const NativeBlastedImage = NativeModules.BlastedImage
-? NativeModules.BlastedImage
-: new Proxy(
-	{},
-	{
-		get() {
-		throw new Error(LINKING_ERROR);
-		},
-	}
-);
+	? NativeModules.BlastedImage
+	: new Proxy(
+		{},
+		{
+			get() {
+				throw new Error(LINKING_ERROR);
+			},
+		}
+	);
 
 export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null) => {
-
 	if (hybridAssets && cloudUrl === null) {
 		console.error("When using hybridAssets, you must specify a cloudUrl prop. This is the base URL where the local assets are hosted.");
 		hybridAssets = false;
 	}
 
 	return NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl)
-	.catch((error) => {
-		console.error("Error loading image:", error);
-		throw error;
-	});
+		.catch((error) => {
+			console.error("Error loading image:", error);
+			throw error;
+		});
 };
 
 const BlastedImageView = requireNativeComponent('BlastedImageView');
 
-const BlastedImage = ({ 
+const BlastedImage = ({
 	resizeMode = "cover",
 	isBackground = false,
 	fallbackSource = null,
 	source,
-	width, 
-	onLoad, 
-	onError, 
-	height, 
-	style, 
-	children 
+	width,
+	onLoad,
+	onError,
+	height,
+	style,
+	children
 }) => {
 	const [error, setError] = useState(false);
-	
-	if (typeof source === 'object') {
-		source = {
-			uri: '',
-			hybridAssets: false,
-			cloudUrl: null,
-			...source
-		};
 
-		if (source.hybridAssets && source.cloudUrl === null) {
+	if (typeof source === 'object') {
+		if (source.hybridAssets && !source.cloudUrl) {
 			console.error("When using hybridAssets, you must specify a cloudUrl prop. This is the base URL where the local assets are hosted.");
-			source.hybridAssets = false;
 		}
 	}
 
@@ -71,24 +62,24 @@ const BlastedImage = ({
 	}
 
 	useEffect(() => {
-		if (typeof source === 'number' || (typeof source === 'object' && source.uri && source.uri.startsWith('file://')) || error) {
+		if (typeof source === 'number' || (typeof source === 'object' && source.uri && source.uri.startsWith('file://'))) {
 			return;
 		}
 
 		const fetchImage = async () => {
-		try {
-			setError(false);
-			await loadImage(source.uri, false, source.hybridAssets, source.cloudUrl);
-			onLoad?.();
-		} catch (err) {
-			setError(true);
-			console.error(err);
-			onError?.(err);
-		}
+			try {
+				setError(false);
+				await loadImage(source.uri, false, source.hybridAssets, source.cloudUrl);
+				onLoad?.();
+			} catch (err) {
+				setError(true);
+				console.error(err);
+				onError?.(err);
+			}
 		};
-		
+
 		fetchImage();
-	}, [source, error]);
+	}, [source]);
 
 	// Flatten styles if provided as an array, otherwise use style as-is
 	const flattenedStyle = Array.isArray(style) ? Object.assign({}, ...style) : style;
@@ -135,60 +126,65 @@ const BlastedImage = ({
 	};
 
 	const childrenStyle = {
-	  position: 'absolute',
-	  top: 0,
-	  left: 0,
-	  justifyContent:'center',
-	  alignItems:'center',
-	  width: adjustedWidth,
-	  height: adjustedHeight,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		width: adjustedWidth,
+		height: adjustedHeight,
 	};
 
 	return (
-	  <View style={!isBackground ? viewStyle : null}>
-		{isBackground ? (
-		  <View style={viewStyle}>
-			{renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)}
-		  </View>
-		) : (
-		  renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)
-		)}
-		{isBackground && <View style={childrenStyle}>{children}</View>}
-	  </View>
+		<View style={!isBackground ? viewStyle : null}>
+			{isBackground ? (
+				<View style={viewStyle}>
+					{renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)}
+				</View>
+			) : (
+				renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)
+			)}
+			{isBackground && <View style={childrenStyle}>{children}</View>}
+		</View>
 	);
 };
 
 function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode) {
+	const validatedSource = {
+		...source,
+		hybridAssets: Boolean(source.hybridAssets && source.cloudUrl),
+	};
+	
 	if (error) {
 		if (fallbackSource) { // Error - Fallback specified, use native component
 			return (
 				<Image
-				source={fallbackSource}
-				style={{ width: adjustedHeight, height: adjustedHeight }}
-				resizeMode={resizeMode}
+					source={fallbackSource}
+					style={{ width: adjustedHeight, height: adjustedHeight }}
+					resizeMode={resizeMode}
 				/>
 			);
 		} else { // Error - No fallback, use native component with static asset
 			return (
 				<Image
-				source={require('./assets/image-error.png')}
-				style={{ width: adjustedHeight, height: adjustedHeight }}
-				resizeMode={resizeMode}
+					source={require('./assets/image-error.png')}
+					style={{ width: adjustedHeight, height: adjustedHeight }}
+					resizeMode={resizeMode}
 				/>
 			);
 		}
-	} else if (typeof source === 'number') { // Success - with local asset (require), no need to use cache
+	} else if (typeof validatedSource === 'number') { // Success - with local asset (require), no need to use cache
 		return (
 			<Image
-				source={source}
+				source={validatedSource}
 				style={{ width: adjustedWidth, height: adjustedHeight }}
 				resizeMode={resizeMode}
 			/>
 		);
-	} else if (typeof source === 'object' && source.uri && source.uri.startsWith('file://')) { // Success - with local asset (file://android_asset), no need to use cache
+	} else if (typeof validatedSource === 'object' && validatedSource.uri && validatedSource.uri.startsWith('file://')) { // Success - with local asset (file://android_asset), no need to use cache
 		return (
 			<Image
-				source={{ uri: source.uri }}
+				source={{ uri: validatedSource.uri }}
 				style={{ width: adjustedWidth, height: adjustedHeight }}
 				resizeMode={resizeMode}
 			/>
@@ -196,7 +192,7 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 	} else { // Success - with remote asset (http/https), use native component with full cache support
 		return (
 			<BlastedImageView
-				source={source}
+				source={validatedSource}
 				width={adjustedWidth}
 				height={adjustedHeight}
 				resizeMode={resizeMode}
@@ -207,17 +203,17 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 
 // clear memory cache
 BlastedImage.clearMemoryCache = () => {
-  	return NativeBlastedImage.clearMemoryCache();
+	return NativeBlastedImage.clearMemoryCache();
 };
 
 // clear disk cache
 BlastedImage.clearDiskCache = () => {
-  	return NativeBlastedImage.clearDiskCache();
+	return NativeBlastedImage.clearDiskCache();
 };
 
 // clear disk and memory cache
 BlastedImage.clearAllCaches = () => {
-  	return NativeBlastedImage.clearAllCaches();
+	return NativeBlastedImage.clearAllCaches();
 };
 
 BlastedImage.preload = (input) => {

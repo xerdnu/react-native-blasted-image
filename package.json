@@ -1,6 +1,6 @@
 {
   "name": "react-native-blasted-image",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A simple yet powerful image component for React Native, powered by Glide and SDWebImage",
   "main": "index.js",
   "types": "index.d.ts",

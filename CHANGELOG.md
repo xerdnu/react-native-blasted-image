@@ -1,3 +1,9 @@
+## [1.0.8] (2025-01-03)
+
+#### Improvements
+
+-   Added request cache for promises to reduce network delay and make sure all images only loads once and remove excessive warning when loading huge amount of images at the same time.
+
 ## [1.0.7] (2024-10-22)
 
 #### Improvements
@@ -200,6 +206,7 @@
 
 -   Initial release.
 
+[1.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.4...v1.0.5

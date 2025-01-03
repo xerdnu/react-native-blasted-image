@@ -17,6 +17,10 @@ const NativeBlastedImage = NativeModules.BlastedImage
 	}
 );
 
+const BlastedImageView = requireNativeComponent('BlastedImageView');
+
+const requestsCache = {};
+
 export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null) => {
 
 	if (hybridAssets && cloudUrl === null) {
@@ -24,14 +28,21 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 		hybridAssets = false;
 	}
 
-	return NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl)
-	.catch((error) => {
-		console.error("Error loading image:", error);
-		throw error;
-	});
-};
+	const cacheKey = `${imageUrl}::${!!skipMemoryCache}::${!!hybridAssets}::${cloudUrl || ''}`;
 
-const BlastedImageView = requireNativeComponent('BlastedImageView');
+
+	if (!requestsCache[cacheKey]) {
+
+		requestsCache[cacheKey] = NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl)
+		  .catch((error) => {
+			delete requestsCache[cacheKey];
+			console.error("Error loading image:", error);
+			throw error;
+		  });
+	}
+
+	return requestsCache[cacheKey];	
+};
 
 const BlastedImage = ({ 
 	resizeMode = "cover",

@@ -172,6 +172,15 @@ useEffect(() => {
 ## Credits
 This component was created with inspiration from [react-native-fast-image](https://github.com/DylanVann/react-native-fast-image) that also uses [Glide](https://github.com/bumptech/glide) and [SDWebImage](https://github.com/SDWebImage/SDWebImage). But due to its lack of ongoing maintenance i felt the need to develop this new image component to continue providing robust and performant caching functionality.
 
+## Support My Work! 🎉
+I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — LogoDuel.
+
+LogoDuel is a fun, fast-paced multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+
+👉 Download now and let the logo battle begin!
+
+[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
+
 ## Contributing
 Contributions are welcome! If you find a bug or have a feature request, please open an issue. If you want to contribute code, please open a pull request.
 

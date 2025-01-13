@@ -1,3 +1,20 @@
+## [1.0.8] (2025-01-12)
+
+#### New Features
+
+-   Added retry feature using the `retries` parameter if image fails to load.
+
+#### Improvements
+
+-   Reworked the useEffect and implemented useCallback aswell to no re-create the function every time the component re-renders.
+-   Reworked the preload function to use allSettled instead of manual array iteration.
+-   Changed various parts of the code to increase performance.
+
+#### Bug Fixes
+
+-   Fixed a bug where the component did not show additional images due to error. ([#26](https://github.com/xerdnu/react-native-blasted-image/pull/26/))
+-   Fixed logging issues.
+
 ## [1.0.8] (2025-01-03)
 
 #### Improvements
@@ -206,6 +223,7 @@
 
 -   Initial release.
 
+[1.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.5...v1.0.6

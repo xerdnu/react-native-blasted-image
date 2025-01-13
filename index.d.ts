@@ -19,13 +19,19 @@ declare module 'react-native-blasted-image' {
       onLoad?: () => void;
       onError?: (error: Error) => void;
       children?: React.ReactNode;
+      retries?: number;
     }
   
     interface BlastedImageStatic {
       clearMemoryCache(): void;
       clearDiskCache(): void;
       clearAllCaches(): void;
-      preload(input: { uri: string; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null } | Array<{ uri: string; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }>): Promise<void>;
+      preload(
+        input:
+            | { uri: string; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }
+            | Array<{ uri: string; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }>,
+        retries?: number
+    ): Promise<void>;
     }
   
     const BlastedImage: React.FC<BlastedImageProps> & BlastedImageStatic;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect/*, useRef*/ } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { requireNativeComponent, NativeModules, Platform, Image, View } from 'react-native';
 
 const LINKING_ERROR =
@@ -21,7 +21,11 @@ const BlastedImageView = requireNativeComponent('BlastedImageView');
 
 const requestsCache = {};
 
-export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null) => {
+export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null, retries = 3) => {
+
+	if (typeof retries !== 'number' || retries <= 0) {
+		retries = 1;
+	}
 
 	if (hybridAssets && cloudUrl === null) {
 		console.error("When using hybridAssets, you must specify a cloudUrl prop. This is the base URL where the local assets are hosted.");
@@ -33,12 +37,21 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 
 	if (!requestsCache[cacheKey]) {
 
-		requestsCache[cacheKey] = NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl)
-		  .catch((error) => {
-			delete requestsCache[cacheKey];
-			console.error("Error loading image:", error);
-			throw error;
-		  });
+        requestsCache[cacheKey] = new Promise(async (resolve, reject) => {
+            for (let attempt = 1; attempt <= retries; attempt++) {
+                try {
+                    await NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl);
+                    resolve();
+                    return;
+                } catch (error) {
+                    console.warn(`Attempt ${attempt} failed for ${imageUrl}`);
+                    if (attempt === retries) {
+                        delete requestsCache[cacheKey]; // Clear failed cache entry
+                        reject(error);
+                    }
+                }
+            }
+        });
 	}
 
 	return requestsCache[cacheKey];	
@@ -48,15 +61,17 @@ const BlastedImage = ({
 	resizeMode = "cover",
 	isBackground = false,
 	fallbackSource = null,
+	retries = 3,
 	source,
 	width, 
 	onLoad, 
 	onError, 
 	height, 
 	style, 
-	children 
+	children
 }) => {
 	const [error, setError] = useState(false);
+	const errorRef = useRef({});
 	
 	if (typeof source === 'object') {
 		source = {
@@ -82,24 +97,37 @@ const BlastedImage = ({
 	}
 
 	useEffect(() => {
-		if (typeof source === 'number' || (typeof source === 'object' && source.uri && source.uri.startsWith('file://')) || error) {
+		if (typeof source === 'number' || (typeof source === 'object' && source.uri && source.uri.startsWith('file://'))) {
 			return;
 		}
 
-		const fetchImage = async () => {
+        // Check if this image URI already failed
+        if (errorRef.current[source.uri]) {
+            setError(true);
+            return;
+        }		
+		
+		fetchImage();
+	}, [source, retries]);
+
+	// Callback for fetching image to not cause re-renders
+	const fetchImage = useCallback(async () => {
+		if (!source?.uri) {
+			console.error("Invalid source URI.");
+			return;
+		}
+
 		try {
 			setError(false);
-			await loadImage(source.uri, false, source.hybridAssets, source.cloudUrl);
+			await loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, retries);
 			onLoad?.();
 		} catch (err) {
 			setError(true);
-			console.error(err);
+			errorRef.current[source.uri] = true;
+			console.error(`Failed to load image: ${source.uri}`, err);
 			onError?.(err);
 		}
-		};
-		
-		fetchImage();
-	}, [source, error]);
+	}, [source, retries]);	
 
 	// Flatten styles if provided as an array, otherwise use style as-is
 	const flattenedStyle = Array.isArray(style) ? Object.assign({}, ...style) : style;
@@ -231,16 +259,16 @@ BlastedImage.clearAllCaches = () => {
   	return NativeBlastedImage.clearAllCaches();
 };
 
-BlastedImage.preload = (input) => {
+BlastedImage.preload = (input, retries = 3) => {
 	return new Promise((resolve) => {
 		// single object
 		if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
-			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl)
+			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl, retries)
 				.then(() => {
 					resolve();
 				})
 				.catch((err) => {
-					console.error("Error preloading single image:", err);
+					console.error(`Error preloading single image: ${input.uri}`, err);
 					resolve(); // Count as handled even if failed to continue processing
 				});
 		}
@@ -254,7 +282,7 @@ BlastedImage.preload = (input) => {
 			}
 
 			input.forEach(image => {
-				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl)
+				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl, retries)
 					.then(() => {
 						loadedCount++;
 						if (loadedCount === input.length) {
@@ -262,7 +290,7 @@ BlastedImage.preload = (input) => {
 						}
 					})
 					.catch((err) => {
-						console.error("Error preloading one of the array images:", err);
+						console.error(`Error preloading one of the array images: ${image.uri}`, err);
 						loadedCount++; // Count as handled even if failed to continue processing
 						if (loadedCount === input.length) {
 							resolve();

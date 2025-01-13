@@ -60,6 +60,7 @@ import BlastedImage from 'react-native-blasted-image';
 | `resizeMode` | `String`          | (Optional) Resize the image with one of the options: `cover`&nbsp;`contain`&nbsp;`center`&nbsp;`stretch`  | cover |
 | `isBackground` | `Boolean`          | (Optional) Makes the image act as a container background similar to the native `ImageBackground` component  | false |
 | `fallbackSource` | `Object`          | (Optional) Object containing a `uri` string for a custom error image.  | - |
+| `retries` | `Number`          | (Optional) Specifies the number of retry attempts if the image fails to load.  | 3 |
 | `onLoad` | `Function`          | (Optional) Callback function that gets called when the image has loaded succesfully.  | - |
 | `onError` | `Function`          | (Optional) Callback function that gets called when there was an error loading the image.  | - |
 | `style`      | `Object`          | (Optional) Styles to be applied to the image, e.g., `{borderRadius:20}`.<br>See [View Style Props](https://reactnative.dev/docs/view-style-props) for all available styles.       
@@ -77,9 +78,11 @@ import BlastedImage from 'react-native-blasted-image';
 BlastedImage.preload([
   { uri: 'https://example.com/image1.jpg' },
   { uri: 'https://example.com/image2.jpg', skipMemoryCache: true },
-  { uri: 'https://example.com/image2.jpg', skipMemoryCache: true, hybridAssets: true, cloudUrl: "https://www.example.com/" }
-]);
+  { uri: 'https://example.com/image3.jpg', skipMemoryCache: true, hybridAssets: true, cloudUrl: "https://www.example.com/" }
+], 5);
 ```
+> **Note**: The last parameter in preload is how many times the image should `retry`. If not specified it defaults to `3`.
+
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
 | `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool, hybridAssets: bool, cloudUrl: string }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.                   |
@@ -171,6 +174,15 @@ useEffect(() => {
 
 ## Credits
 This component was created with inspiration from [react-native-fast-image](https://github.com/DylanVann/react-native-fast-image) that also uses [Glide](https://github.com/bumptech/glide) and [SDWebImage](https://github.com/SDWebImage/SDWebImage). But due to its lack of ongoing maintenance i felt the need to develop this new image component to continue providing robust and performant caching functionality.
+
+## Support My Work! 🎉
+I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — LogoDuel.
+
+LogoDuel is a fun, fast-paced multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+
+👉 Download now and let the logo battle begin!
+
+[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
 
 ## Contributing
 Contributions are welcome! If you find a bug or have a feature request, please open an issue. If you want to contribute code, please open a pull request.

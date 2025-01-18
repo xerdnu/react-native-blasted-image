@@ -5,6 +5,15 @@
 
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
+## Support My Work! 🎉
+I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — LogoDuel.
+
+LogoDuel is a fun, fast-paced multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+
+👉 Download now and let the logo battle begin!
+
+[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
+
 ## Description
 Caching remote images has always been a challenge for me with the Image component in React Native. This simplified, yet powerful component, addresses that issue head-on. It offers a robust and performant mechanism for caching remote images, ensuring they're displayed quickly.<br><br>Leveraging the strengths of Glide and SDWebImage, it supports both memory and disk caching for remote images. The newly added Hybrid Assets feature allows you to bundle remote assets in your build, fetching from the network only when necessary. Notably, while it provides these enhanced capabilities for remote images, it seamlessly integrates with the standard React Native Image component when handling local assets using require.
 

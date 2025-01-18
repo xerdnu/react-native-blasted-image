@@ -6,9 +6,9 @@
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
 ## Support My Work! 🎉
-I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — LogoDuel.
+I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — **LogoDuel**.
 
-LogoDuel is a fun, fast-paced multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+**LogoDuel** is a fun, fast-paced multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
 
 👉 Download now and let the logo battle begin!
 

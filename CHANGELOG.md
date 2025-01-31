@@ -1,4 +1,37 @@
-## [1.0.8] (2025-01-12)
+## [1.1.0] (2025-01-31)
+
+#### 🚨 Breaking Changes (Android Only)
+-   **Upgraded Glide from 4.12.0 to 4.16.0** which may cause duplicate class conflicts if another package in your project also includes Glide.
+  
+If you encounter a build error stating `com.bumptech.glide.GeneratedAppGlideModuleImpl is defined multiple times` it means another package in your project is also bundling Glide.
+
+To resolve this check the error message for the conflicting package and remove it if not needed.
+
+Alternatively ensure all dependencies use the same Glide version by adding the following to your android/app/build.gradle file:
+```
+dependencies {
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+}
+```
+#### ✨ New Features
+
+-   Added support for returning image dimensions via `onLoad` in combination by setting the `returnSize` param. ([#32](https://github.com/xerdnu/react-native-blasted-image/issues/32))
+-   Added support for `SVG` images.
+-   Added support for `AVIF` images. ([#20](https://github.com/xerdnu/react-native-blasted-image/issues/20))
+-   Added support for changing color with `tintColor` parameter. ([#11](https://github.com/xerdnu/react-native-blasted-image/issues/11))
+
+#### 🔥 Improvements
+
+-   Reworked parts of the code and created renderKey that will make sure images that failed in retry operation re-renders. ([#31](https://github.com/xerdnu/react-native-blasted-image/issues/31))
+-   Reworked other parts of the code for increased performance.
+
+#### 🔄 Changes
+
+-   Updated documentation.
+-   Changed repo for Android buildscript.
+-   Increased caching limits.
+
+## [1.0.9] (2025-01-12)
 
 #### New Features
 
@@ -223,6 +256,7 @@
 
 -   Initial release.
 
+[1.1.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.9...v1.1.0
 [1.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.6...v1.0.7

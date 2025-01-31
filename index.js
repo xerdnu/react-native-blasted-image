@@ -38,13 +38,21 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 	if (!requestsCache[cacheKey]) {
 
         requestsCache[cacheKey] = new Promise(async (resolve, reject) => {
+
+			let wasRetried = false;
+
             for (let attempt = 1; attempt <= retries; attempt++) {
+				// sleep for 1 second before retrying if attempt > 1
+				if (attempt > 1) {
+					wasRetried = true;
+					// await new Promise(resolve => setTimeout(resolve, 5000)); Keep for testing purposes
+				}
                 try {
                     await NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl);
-                    resolve();
+                    resolve({ wasRetried });
                     return;
                 } catch (error) {
-                    console.warn(`Attempt ${attempt} failed for ${imageUrl}`);
+                    console.warn(`[BlastedImage] Attempt ${attempt} failed for ${imageUrl}`);
                     if (attempt === retries) {
                         delete requestsCache[cacheKey]; // Clear failed cache entry
                         reject(error);
@@ -60,7 +68,9 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 const BlastedImage = ({ 
 	resizeMode = "cover",
 	isBackground = false,
+	returnSize = false,
 	fallbackSource = null,
+	tintColor = null,
 	retries = 3,
 	source,
 	width, 
@@ -72,6 +82,8 @@ const BlastedImage = ({
 }) => {
 	const [error, setError] = useState(false);
 	const errorRef = useRef({});
+	const [renderKey, setRenderKey] = useState(null);
+	const isDoneRef = useRef(false);
 	
 	if (typeof source === 'object') {
 		source = {
@@ -106,9 +118,13 @@ const BlastedImage = ({
             setError(true);
             return;
         }		
+
+		if (isDoneRef.current) {
+			return;
+		}		
 		
 		fetchImage();
-	}, [source, retries]);
+	}, [source]);
 
 	// Callback for fetching image to not cause re-renders
 	const fetchImage = useCallback(async () => {
@@ -117,6 +133,7 @@ const BlastedImage = ({
 			return;
 		}
 
+		/*
 		try {
 			setError(false);
 			await loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, retries);
@@ -127,6 +144,37 @@ const BlastedImage = ({
 			console.error(`Failed to load image: ${source.uri}`, err);
 			onError?.(err);
 		}
+		*/
+
+		loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, retries)
+		.then(({wasRetried}) => {
+			// Finally succeeded
+			isDoneRef.current = true;
+			if (wasRetried) {
+				const key = Math.random().toString(36).substring(2, 8);
+				setRenderKey(key);
+			}
+			setError(false);
+			//onLoad?.();
+			
+			if (returnSize) {
+				Image.getSize(source.uri, (width, height) => {
+					onLoad?.({ width, height });
+				}, (error) => {
+					console.warn('[BlastedImage] Failed to get image size:', error);
+					onLoad?.(null);
+				});			
+			} else {
+				onLoad?.();
+			}
+		})
+		.catch((err) => {
+			isDoneRef.current = true;
+			setError(true);
+			errorRef.current[source.uri] = true;
+			console.error(`Failed to load image: ${source.uri}`, err);
+			onError?.(err);
+		});		
 	}, [source, retries]);	
 
 	// Flatten styles if provided as an array, otherwise use style as-is
@@ -153,12 +201,12 @@ const BlastedImage = ({
 	} = remainingStyle;
 
 	if (typeof width === 'string' && width.includes('%')) {
-		console.log("For maximum performance, BlastedImage does not support width defined as a percentage");
+		console.log("[BlastedImage] For maximum performance, BlastedImage does not support width defined as a percentage");
 		return;
 	}
 
 	if (typeof height === 'string' && height.includes('%')) {
-		console.log("For maximum performance, BlastedImage does not support height defined as a percentage");
+		console.log("[BlastedImage] For maximum performance, BlastedImage does not support height defined as a percentage");
 		return;
 	}
 
@@ -187,17 +235,17 @@ const BlastedImage = ({
 	  <View style={!isBackground ? viewStyle : null}>
 		{isBackground ? (
 		  <View style={viewStyle}>
-			{renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)}
+			{renderImageContent(error, source, fallbackSource, tintColor, adjustedHeight, adjustedWidth, resizeMode, renderKey)}
 		  </View>
 		) : (
-		  renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode)
+		  renderImageContent(error, source, fallbackSource, tintColor, adjustedHeight, adjustedWidth, resizeMode, renderKey)
 		)}
 		{isBackground && <View style={childrenStyle}>{children}</View>}
 	  </View>
 	);
 };
 
-function renderImageContent(error, source, fallbackSource, adjustedHeight, adjustedWidth, resizeMode) {
+function renderImageContent(error, source, fallbackSource, tintColor, adjustedHeight, adjustedWidth, resizeMode, renderKey) {
 	if (error) {
 		if (fallbackSource) { // Error - Fallback specified, use native component
 			return (
@@ -205,6 +253,7 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 				source={fallbackSource}
 				style={{ width: adjustedHeight, height: adjustedHeight }}
 				resizeMode={resizeMode}
+				tintColor={tintColor}
 				/>
 			);
 		} else { // Error - No fallback, use native component with static asset
@@ -213,6 +262,7 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 				source={require('./assets/image-error.png')}
 				style={{ width: adjustedHeight, height: adjustedHeight }}
 				resizeMode={resizeMode}
+				tintColor={tintColor}
 				/>
 			);
 		}
@@ -222,6 +272,7 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 				source={source}
 				style={{ width: adjustedWidth, height: adjustedHeight }}
 				resizeMode={resizeMode}
+				tintColor={tintColor}
 			/>
 		);
 	} else if (typeof source === 'object' && source.uri && source.uri.startsWith('file://')) { // Success - with local asset (file://android_asset), no need to use cache
@@ -230,15 +281,26 @@ function renderImageContent(error, source, fallbackSource, adjustedHeight, adjus
 				source={{ uri: source.uri }}
 				style={{ width: adjustedWidth, height: adjustedHeight }}
 				resizeMode={resizeMode}
+				tintColor={tintColor}
 			/>
 		);
 	} else { // Success - with remote asset (http/https), use native component with full cache support
-		return (
+		return renderKey != null ? (
 			<BlastedImageView
-				source={source}
-				width={adjustedWidth}
-				height={adjustedHeight}
-				resizeMode={resizeMode}
+			  key={renderKey} // Force re-render when image is retried
+			  source={source}
+			  width={adjustedWidth}
+			  height={adjustedHeight}
+			  resizeMode={resizeMode}
+			  tintColor={tintColor}
+			/>
+		) : (
+			<BlastedImageView
+			  source={source}
+			  width={adjustedWidth}
+			  height={adjustedHeight}
+			  resizeMode={resizeMode}
+			  tintColor={tintColor}
 			/>
 		);
 	}

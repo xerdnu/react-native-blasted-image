@@ -64,7 +64,7 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
         if (!isGlideInitialized) {
             Glide.init(reactContext, new GlideBuilder()
                 .setDiskCache(new InternalCacheDiskCacheFactory(reactContext, 1024 * 1024 * 1024)) //1gb disk cache
-                .setMemoryCache(new LruResourceCache(100 * 1024 * 1024)) // 100mb memory cache
+                .setMemoryCache(new LruResourceCache(256 * 1024 * 1024)) // 256mb memory cache
             );
             isGlideInitialized = true;
         }        
@@ -129,6 +129,7 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
     public void loadImage(String imageUrl, boolean skipMemoryCache, boolean hybridAssets, String cloudUrl, Promise promise) {
 
         try {
+            // See BlastedImageModule.m for details regarding NativeEventEmitters (BlastedEventLog etc.)
             Object glideUrl = prepareGlideUrl(imageUrl, hybridAssets, cloudUrl, true);
 
             // Is skip skipMemoryCache set for image and should we store it only to disk?

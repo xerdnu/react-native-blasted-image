@@ -2,6 +2,8 @@
 #import <React/RCTEventEmitter.h>
 #import <SDWebImage/SDWebImage.h>
 #import <React/RCTConvert.h>
+#import <SDWebImageSVGCoder/SDWebImageSVGCoder.h>
+#import <SDWebImageAVIFCoder/SDWebImageAVIFCoder.h>
 
 @implementation BlastedImageModule
 {
@@ -13,10 +15,19 @@ RCT_EXPORT_MODULE(BlastedImage);
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Cache configuration
         SDImageCacheConfig *cacheConfig = [SDImageCache sharedImageCache].config;
         cacheConfig.maxDiskSize = 1024 * 1024 * 1024; // 1GB
         cacheConfig.maxDiskAge = NSIntegerMax; // No max time for disk cache
-        cacheConfig.maxMemoryCost = 100 * 1024 * 1024; // 100MB memory cache
+        cacheConfig.maxMemoryCost = 256 * 1024 * 1024; // 256MB memory cache
+
+        // Add SVG support
+        SDImageSVGCoder *svgCoder = [SDImageSVGCoder sharedCoder];
+        [[SDImageCodersManager sharedManager] addCoder:svgCoder];  
+
+        // Add AVIF support
+        SDImageAVIFCoder *avifCoder = [SDImageAVIFCoder sharedCoder];
+        [[SDImageCodersManager sharedManager] addCoder:avifCoder];              
     }
     return self;
 }
@@ -111,6 +122,7 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
                 resolver:(RCTPromiseResolveBlock)resolve 
                 rejecter:(RCTPromiseRejectBlock)reject) {
 
+    // If showing image right after setting up NativeEventEmitters (BlastedEventLog etc.) the log might not show on iOS. Fix is to add a delay before showing the image but this is not a good solution or an option for production. Lets keep it as it is for now.
     NSURL *url = [self prepareUrl:imageUrl hybridAssets:hybridAssets cloudUrl:cloudUrl showLog:YES];
 
     // Is skip skipMemoryCache set for image and should we store it only to disk?

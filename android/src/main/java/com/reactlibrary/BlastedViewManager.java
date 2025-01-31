@@ -7,6 +7,8 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 
+import androidx.annotation.Nullable;
+
 import android.widget.ImageView;
 import android.view.View;
 import android.view.ViewOutlineProvider;
@@ -15,6 +17,10 @@ import android.view.ViewGroup;
 import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
 import android.graphics.Rect;
+
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 
 import android.util.Log;
 
@@ -116,6 +122,23 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
             view.setLayoutParams(layoutParams);
         }
     }
+
+    @ReactProp(name = "tintColor")
+    public void setTintColor(ImageView view, @Nullable String color) {
+        if (color != null && !color.isEmpty()) {
+            try {
+                if (!color.startsWith("#") && color.length() == 6 && color.matches("[0-9A-Fa-f]+")) {
+                    color = "#" + color;
+                }
+                int parsedColor = Color.parseColor(color);
+                view.setColorFilter(new PorterDuffColorFilter(parsedColor, PorterDuff.Mode.SRC_IN));
+            } catch (IllegalArgumentException e) {
+                Log.e("BlastedViewManager", "Invalid color format: " + color);
+            }
+        } else {
+            view.clearColorFilter();
+        }
+    }    
 
     // more properties... :)
 }

@@ -11,15 +11,17 @@ declare module 'react-native-blasted-image' {
     interface BlastedImageProps {
       resizeMode?: 'cover' | 'contain' | 'stretch' | 'repeat' | 'center';
       isBackground?: boolean;
+      returnSize?: boolean;
       fallbackSource?: ImageSourcePropType;
       source: SourceProp | number;
       width?: number;
       height?: number;
       style?: StyleProp<ViewStyle>;
-      onLoad?: () => void;
+      onLoad?: (size?: ImageSize | null) => void; 
       onError?: (error: Error) => void;
       children?: React.ReactNode;
       retries?: number;
+      tintColor?: string;
     }
   
     interface BlastedImageStatic {

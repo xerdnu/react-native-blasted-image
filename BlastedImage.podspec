@@ -19,5 +19,7 @@ Pod::Spec.new do |s|
 
   s.dependency "React-Core"
   s.dependency "SDWebImage"
+  s.dependency "SDWebImageSVGCoder"
+  s.dependency 'SDWebImageAVIFCoder'
 
 end

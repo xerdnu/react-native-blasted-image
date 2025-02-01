@@ -1,5 +1,6 @@
 # :rocket: BlastedImage
 [![npm downloads](https://img.shields.io/npm/dm/react-native-blasted-image.svg?style=for-the-badge)](https://www.npmjs.com/package/react-native-blasted-image)
+[![npm downloads](https://img.shields.io/npm/dt/react-native-blasted-image?style=for-the-badge&color=42A5F5)](https://www.npmjs.com/package/react-native-blasted-image)
 [![platform - android](https://img.shields.io/badge/platform-Android-3ddc84.svg?logo=android&style=for-the-badge)](https://www.android.com)
 [![platform - ios](https://img.shields.io/badge/platform-iOS-0067b8.svg?logo=apple&style=for-the-badge)](https://developer.apple.com/ios)
 

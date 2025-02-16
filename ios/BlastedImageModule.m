@@ -41,6 +41,10 @@ RCT_EXPORT_MODULE(BlastedImage);
             ];
 }
 
++ (BOOL)requiresMainQueueSetup { 
+    return NO; 
+}
+
 - (void)startObserving {
     hasListeners = YES;
 }

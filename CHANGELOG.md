@@ -1,3 +1,9 @@
+## [1.1.1] (2025-02-16)
+
+#### Bug Fixes
+
+-   Fixed a bug regarding warning about module initialization on main thread. ([#35](https://github.com/xerdnu/react-native-blasted-image/issues/35))
+
 ## [1.1.0] (2025-01-31)
 
 #### 🚨 Breaking Changes (Android Only)
@@ -256,6 +262,7 @@ dependencies {
 
 -   Initial release.
 
+[1.1.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.9...v1.1.0
 [1.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.7...v1.0.8

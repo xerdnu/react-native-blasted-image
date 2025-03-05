@@ -251,7 +251,7 @@ function renderImageContent(error, source, fallbackSource, tintColor, adjustedHe
 			return (
 				<Image
 				source={fallbackSource}
-				style={{ width: adjustedHeight, height: adjustedHeight }}
+				style={{ width: adjustedWidth, height: adjustedHeight }}
 				resizeMode={resizeMode}
 				tintColor={tintColor}
 				/>
@@ -260,7 +260,7 @@ function renderImageContent(error, source, fallbackSource, tintColor, adjustedHe
 			return (
 				<Image
 				source={require('./assets/image-error.png')}
-				style={{ width: adjustedHeight, height: adjustedHeight }}
+				style={{ width: adjustedWidth, height: adjustedHeight }}
 				resizeMode={resizeMode}
 				tintColor={tintColor}
 				/>

@@ -1,3 +1,9 @@
+## [1.1.2] (2025-03-09)
+
+#### Bug Fixes
+
+-   Merge of pull request to fix typo regarding the fallbackSource width. ([#36](https://github.com/xerdnu/react-native-blasted-image/pull/36))
+
 ## [1.1.1] (2025-02-16)
 
 #### Bug Fixes
@@ -262,6 +268,7 @@ dependencies {
 
 -   Initial release.
 
+[1.1.2]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.9...v1.1.0
 [1.0.9]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.8...v1.0.9

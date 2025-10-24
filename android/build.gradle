@@ -39,7 +39,10 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
 
     // AVIF support
-    implementation 'com.github.bumptech.glide:avif-integration:4.16.0'
+    implementation 'org.aomedia.avif.android:avif:1.3.0.841110fd'
+    implementation ("com.github.bumptech.glide:avif-integration:4.16.0") {
+        exclude group: 'org.aomedia.avif.android', module: 'avif'
+    }
 
     // SVG support
     api 'com.caverock:androidsvg-aar:1.4'

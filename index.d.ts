@@ -2,8 +2,14 @@ declare module 'react-native-blasted-image' {
     import * as React from 'react';
     import { ImageSourcePropType, ViewStyle, StyleProp } from 'react-native';
   
+    interface ImageSize {
+      width: number;
+      height: number;
+    }
+
     interface SourceProp {
       uri: string;
+      headers?: { [key: string]: string };
       hybridAssets?: boolean;
       cloudUrl?: string | null;
     }
@@ -30,8 +36,8 @@ declare module 'react-native-blasted-image' {
       clearAllCaches(): void;
       preload(
         input:
-            | { uri: string; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }
-            | Array<{ uri: string; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }>,
+            | { uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }
+            | Array<{ uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }>,
         retries?: number
     ): Promise<void>;
     }
@@ -42,7 +48,8 @@ declare module 'react-native-blasted-image' {
       imageUrl: string,
       skipMemoryCache?: boolean,
       hybridAssets?: boolean,
-      cloudUrl?: string | null
+      cloudUrl?: string | null,
+      headers?: { [key: string]: string }
     ): Promise<void>;
   
     export default BlastedImage;

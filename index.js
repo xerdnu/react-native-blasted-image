@@ -21,7 +21,7 @@ const BlastedImageView = requireNativeComponent('BlastedImageView');
 
 const requestsCache = {};
 
-export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null, retries = 3) => {
+export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null, headers = null, retries = 3) => {
 
 	if (typeof retries !== 'number' || retries <= 0) {
 		retries = 1;
@@ -32,7 +32,8 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 		hybridAssets = false;
 	}
 
-	const cacheKey = `${imageUrl}::${!!skipMemoryCache}::${!!hybridAssets}::${cloudUrl || ''}`;
+	const headersKey = headers ? JSON.stringify(headers) : '';
+	const cacheKey = `${imageUrl}::${!!skipMemoryCache}::${!!hybridAssets}::${cloudUrl || ''}::${headersKey}`;
 
 
 	if (!requestsCache[cacheKey]) {
@@ -48,7 +49,7 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 					// await new Promise(resolve => setTimeout(resolve, 5000)); Keep for testing purposes
 				}
                 try {
-                    await NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl);
+                    await NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl, headers);
                     resolve({ wasRetried });
                     return;
                 } catch (error) {
@@ -88,6 +89,7 @@ const BlastedImage = ({
 	if (typeof source === 'object') {
 		source = {
 			uri: '',
+			headers: null,
 			hybridAssets: false,
 			cloudUrl: null,
 			...source
@@ -146,7 +148,7 @@ const BlastedImage = ({
 		}
 		*/
 
-		loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, retries)
+		loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, source.headers, retries)
 		.then(({wasRetried}) => {
 			// Finally succeeded
 			isDoneRef.current = true;
@@ -325,7 +327,7 @@ BlastedImage.preload = (input, retries = 3) => {
 	return new Promise((resolve) => {
 		// single object
 		if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
-			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl, retries)
+			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl, input.headers, retries)
 				.then(() => {
 					resolve();
 				})
@@ -344,7 +346,7 @@ BlastedImage.preload = (input, retries = 3) => {
 			}
 
 			input.forEach(image => {
-				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl, retries)
+				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl, image.headers, retries)
 					.then(() => {
 						loadedCount++;
 						if (loadedCount === input.length) {

@@ -1,3 +1,19 @@
+## [1.1.3] (2025-10-24)
+
+#### 🔥 Improvements
+
+-   Merge of pull request to add AVIF 16 KB support in alignment with Google Play's new page size requirement ([#44](https://github.com/xerdnu/react-native-blasted-image/pull/44))
+
+#### ✨ New Features
+
+-   Added support for sending Authorization headers when requesting images. ([#38](https://github.com/xerdnu/react-native-blasted-image/issues/38))
+-   Added support for Base64 encoded images. ([#40](https://github.com/xerdnu/react-native-blasted-image/issues/40))
+
+#### 🔄 Changes
+
+-   Updated documentation.
+
+
 ## [1.1.2] (2025-03-09)
 
 #### Bug Fixes
@@ -268,6 +284,7 @@ dependencies {
 
 -   Initial release.
 
+[1.1.3]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.0.9...v1.1.0

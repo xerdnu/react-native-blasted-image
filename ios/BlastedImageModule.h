@@ -8,6 +8,7 @@
 - (NSURL *)prepareUrl:(NSString *)imageUrl
         hybridAssets:(BOOL)hybridAssets
             cloudUrl:(NSString *)cloudUrl
+             headers:(NSDictionary *)headers
              showLog:(BOOL)showLog;
 
 @end

@@ -7,11 +7,15 @@
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
 ## Support My Work! 🎉
-I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — **LogoDuel**.
+I truly appreciate your support! If you'd like to help me out, the best way is to check out my apps — **LogoDuel** and **WaterTrack**.
 
-**LogoDuel** is a fun, turn-based multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+⚔️ **LogoDuel** is a fun, turn-based multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
 
-🚀 **Powered by BlastedImage** for performant and optimized image handling.<br><br>👉 Download now and let the logo battle begin!
+🚀 **Powered by BlastedImage** for performant and optimized image handling.
+
+[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
+
+💧 **WaterTrack** is a clean and simple water reminder app that helps you stay hydrated throughout the day — no subscriptions, no fuss, just hydration made easy.
 
 [![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
 
@@ -39,6 +43,7 @@ Caching remote images has always been a challenge for me with the Image componen
 |AVIF|✅|✅|
 |HEIC|✅|✅|
 |ICO|✅|✅|
+|BASE64|✅|✅|
 
 ## Installation
 ### With bare React Native 
@@ -73,6 +78,30 @@ import BlastedImage from 'react-native-blasted-image';
   height={200}
   style={{ borderRadius: 10 }}
 />
+
+// With authorization headers
+<BlastedImage 
+  source={{ 
+    uri: 'https://example.com/protected-image.png',
+    headers: {
+      Authorization: 'Bearer your-token-here',
+      'X-Custom-Header': 'custom-value'
+    }
+  }} 
+  resizeMode="cover"
+  width={200}
+  height={200}
+/>
+
+// With base64 data URI
+<BlastedImage 
+  source={{ 
+    uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...'
+  }} 
+  resizeMode="cover"
+  width={200}
+  height={200}
+/>
 ```
 
 ## Paramaters
@@ -93,7 +122,8 @@ import BlastedImage from 'react-native-blasted-image';
 ### Source Parameter
 | Parameter    | Type              | Description                                                                                         | Default |
 |--------------|-------------------|-----------------------------------------------------------------------------------------------------|---------|
-| `uri`     | `String` | (**Required**) URI string for remote images or local images using require.     | -       |
+| `uri`     | `String` | (**Required**) URI string for remote images (http/https), local images (file://), or base64 data URIs (data:image/...).     | -       |
+| `headers`     | `Object` | (Optional) HTTP headers to send with the image request, e.g., `{ Authorization: 'Bearer token' }`. Only applies to remote URLs.     | -       |
 | `hybridAssets`      | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.                                                        | false     |
 | `cloudUrl`     | `String`          | (Optional) Leading URL to the remote assets for Hybrid Assets functionality.<br>(Required if `hybridAssets` is enabled)                                                       | null     |
 
@@ -104,14 +134,25 @@ import BlastedImage from 'react-native-blasted-image';
 BlastedImage.preload([
   { uri: 'https://example.com/image1.jpg' },
   { uri: 'https://example.com/image2.jpg', skipMemoryCache: true },
-  { uri: 'https://example.com/image3.jpg', skipMemoryCache: true, hybridAssets: true, cloudUrl: "https://www.example.com/" }
+  { 
+    uri: 'https://example.com/image3.jpg', 
+    skipMemoryCache: true, 
+    hybridAssets: true, 
+    cloudUrl: "https://www.example.com/" 
+  },
+  { 
+    uri: 'https://example.com/protected-image.jpg',
+    headers: {
+      Authorization: 'Bearer your-token-here'
+    }
+  }
 ], 5);
 ```
 > **Note**: The last parameter in preload is how many times the image should `retry`. If not specified it defaults to `3`.
 
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `Array<{ uri: string, skipMemoryCache: bool, hybridAssets: bool, cloudUrl: string }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk.                   |
+| `BlastedImage.preload()`        | `Array<{ uri: string, headers: object, skipMemoryCache: bool, hybridAssets: bool, cloudUrl: string }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk and include custom HTTP headers.                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |

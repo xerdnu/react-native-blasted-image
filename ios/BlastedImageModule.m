@@ -80,11 +80,21 @@ RCT_EXPORT_MODULE(BlastedImage);
 - (NSURL *)prepareUrl:(NSString *)imageUrl
         hybridAssets:(BOOL)hybridAssets
             cloudUrl:(NSString *)cloudUrl
+             headers:(NSDictionary *)headers
              showLog:(BOOL)showLog {
     
     NSString *imagePath = @"";
     NSURL *url;
     BOOL fileExistsInAssets = NO;
+
+    // Check if it's a base64 data URI
+    if ([imageUrl hasPrefix:@"data:image/"]) {
+        if (showLog) {
+            [self sendEventWithName:@"BlastedEventLog" message:@"Base64 data URI detected"];
+        }
+        url = [NSURL URLWithString:imageUrl];
+        return url;
+    }
 
     if (hybridAssets) {
         imagePath = [self extractImagePathFromUrl:imageUrl cloudUrl:cloudUrl];
@@ -114,6 +124,13 @@ RCT_EXPORT_MODULE(BlastedImage);
         }
 
         url = [NSURL URLWithString:imageUrl];
+        
+        // Configure headers if provided
+        if (headers && headers.count > 0) {
+            if (showLog) {
+                [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Configuring %lu headers for request", (unsigned long)headers.count]];
+            }
+        }
     }
 
     return url;
@@ -122,12 +139,13 @@ RCT_EXPORT_MODULE(BlastedImage);
 RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl 
                 skipMemoryCache:(BOOL)skipMemoryCache 
                 hybridAssets:(BOOL)hybridAssets 
-                cloudUrl:(NSString *)cloudUrl                 
+                cloudUrl:(NSString *)cloudUrl
+                headers:(NSDictionary *)headers
                 resolver:(RCTPromiseResolveBlock)resolve 
                 rejecter:(RCTPromiseRejectBlock)reject) {
 
     // If showing image right after setting up NativeEventEmitters (BlastedEventLog etc.) the log might not show on iOS. Fix is to add a delay before showing the image but this is not a good solution or an option for production. Lets keep it as it is for now.
-    NSURL *url = [self prepareUrl:imageUrl hybridAssets:hybridAssets cloudUrl:cloudUrl showLog:YES];
+    NSURL *url = [self prepareUrl:imageUrl hybridAssets:hybridAssets cloudUrl:cloudUrl headers:headers showLog:YES];
 
     // Is skip skipMemoryCache set for image and should we store it only to disk?
     SDWebImageOptions options = 0;
@@ -135,9 +153,23 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
         options |= SDWebImageAvoidAutoSetImage;
     }
 
+    // Create context with headers if provided
+    SDWebImageContext *context = nil;
+    if (headers && headers.count > 0) {
+        SDWebImageDownloaderRequestModifier *requestModifier = [[SDWebImageDownloaderRequestModifier alloc] initWithBlock:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull request) {
+            NSMutableURLRequest *mutableRequest = [request mutableCopy];
+            for (NSString *key in headers) {
+                [mutableRequest setValue:headers[key] forHTTPHeaderField:key];
+            }
+            return [mutableRequest copy];
+        }];
+        context = @{SDWebImageContextDownloadRequestModifier: requestModifier};
+    }
+
     // Load/Show image using show and preload
     [[SDWebImageManager sharedManager] loadImageWithURL:url
                                                 options:options
+                                                context:context
                                                progress:nil
                                               completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
         if (error) {

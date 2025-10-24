@@ -58,26 +58,59 @@ RCT_CUSTOM_VIEW_PROPERTY(source, NSDictionary, UIImageView) {
     NSString *uri = [RCTConvert NSString:json[@"uri"]];
     BOOL hybridAssets = [RCTConvert BOOL:json[@"hybridAssets"]];
     NSString *cloudUrl = [RCTConvert NSString:json[@"cloudUrl"]];
+    NSDictionary *headers = [RCTConvert NSDictionary:json[@"headers"]];
     NSString *tintColorHex = [RCTConvert NSString:json[@"tintColor"]];
 
-    NSURL *url = [blastedImageModule prepareUrl:uri hybridAssets:hybridAssets cloudUrl:cloudUrl showLog:NO];
+    NSURL *url = [blastedImageModule prepareUrl:uri hybridAssets:hybridAssets cloudUrl:cloudUrl headers:headers showLog:NO];
 
     if (url != nil && ![url.absoluteString isEqualToString:@""]) {
-        //[view sd_setImageWithURL:url];
         UIColor *storedTintColor = objc_getAssociatedObject(view, @selector(tintColor));
+        
+        // Create context with headers if provided
+        SDWebImageContext *context = nil;
+        if (headers && headers.count > 0) {
+            SDWebImageDownloaderRequestModifier *requestModifier = [[SDWebImageDownloaderRequestModifier alloc] initWithBlock:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull request) {
+                NSMutableURLRequest *mutableRequest = [request mutableCopy];
+                for (NSString *key in headers) {
+                    [mutableRequest setValue:headers[key] forHTTPHeaderField:key];
+                }
+                return [mutableRequest copy];
+            }];
+            context = @{SDWebImageContextDownloadRequestModifier: requestModifier};
+        }
 
         if (!storedTintColor) {
-            [view sd_setImageWithURL:url];
+            if (context) {
+                [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 context:context progress:nil completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                    if (image) {
+                        view.image = image;
+                    }
+                }];
+            } else {
+                [view sd_setImageWithURL:url];
+            }
         } else {
-            [view sd_setImageWithURL:url completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-                if (error) return;
+            if (context) {
+                [[SDWebImageManager sharedManager] loadImageWithURL:url options:0 context:context progress:nil completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                    if (error) return;
 
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    view.tintColor = storedTintColor;
-                    view.image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                    [view setNeedsDisplay];
-                });
-            }];            
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        view.tintColor = storedTintColor;
+                        view.image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                        [view setNeedsDisplay];
+                    });
+                }];
+            } else {
+                [view sd_setImageWithURL:url completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                    if (error) return;
+
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        view.tintColor = storedTintColor;
+                        view.image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                        [view setNeedsDisplay];
+                    });
+                }];
+            }
         }
 
         [view setHidden:NO];

@@ -38,7 +38,11 @@ declare module 'react-native-blasted-image' {
         input:
             | { uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }
             | Array<{ uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }>,
-        retries?: number
+        options?: {
+          retries?: number;
+          onLoad?: (uri: string) => void;
+          onError?: (uri: string, error: Error) => void;
+        }
     ): Promise<void>;
     }
   

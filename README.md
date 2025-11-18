@@ -131,6 +131,7 @@ import BlastedImage from 'react-native-blasted-image';
 ```jsx
 import BlastedImage from 'react-native-blasted-image';
 
+// Basic preload
 BlastedImage.preload([
   { uri: 'https://example.com/image1.jpg' },
   { uri: 'https://example.com/image2.jpg', skipMemoryCache: true },
@@ -146,13 +147,27 @@ BlastedImage.preload([
       Authorization: 'Bearer your-token-here'
     }
   }
-], 5);
+], 5); // Legacy API: retries as second parameter
+
+// Preload with callbacks
+BlastedImage.preload([
+  { uri: 'https://example.com/image1.jpg' },
+  { uri: 'https://example.com/image2.jpg' }
+], {
+  retries: 5,
+  onLoad: (uri) => {
+    console.log('Successfully loaded:', uri);
+  },
+  onError: (uri, error) => {
+    console.error('Failed to load:', uri, error);
+  }
+});
 ```
-> **Note**: The last parameter in preload is how many times the image should `retry`. If not specified it defaults to `3`.
+> **Note**: The second parameter can be either a number (retries) for backward compatibility, or an options object with `retries`, `onLoad`, and `onError` properties. If not specified, retries defaults to `3`.
 
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `Array<{ uri: string, headers: object, skipMemoryCache: bool, hybridAssets: bool, cloudUrl: string }>`  | Preloads remote images from an array of URIs, with the option to preload only to disk and include custom HTTP headers.                   |
+| `BlastedImage.preload()`        | `(images: Array<{ uri: string, headers?: object, skipMemoryCache?: bool, hybridAssets?: bool, cloudUrl?: string }>, options?: number \| { retries?: number, onLoad?: (uri: string) => void, onError?: (uri: string, error: any) => void })`  | Preloads remote images from an array of URIs. Supports custom HTTP headers, retry configuration, and optional callbacks for tracking individual image load success/failure.                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |

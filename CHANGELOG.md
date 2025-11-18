@@ -1,3 +1,13 @@
+## [1.1.4] (2025-11-18)
+
+#### ✨ New Features
+
+-   Added support for onLoad and onError callbacks in the preload function to handle load success and failure events.
+
+#### 🔄 Changes
+
+-   Updated documentation.
+
 ## [1.1.3] (2025-10-24)
 
 #### 🔥 Improvements
@@ -12,7 +22,6 @@
 #### 🔄 Changes
 
 -   Updated documentation.
-
 
 ## [1.1.2] (2025-03-09)
 
@@ -284,6 +293,7 @@ dependencies {
 
 -   Initial release.
 
+[1.1.4]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.0...v1.1.1

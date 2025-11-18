@@ -323,16 +323,27 @@ BlastedImage.clearAllCaches = () => {
   	return NativeBlastedImage.clearAllCaches();
 };
 
-BlastedImage.preload = (input, retries = 3) => {
+BlastedImage.preload = (input, options = {}) => {
+	// Support legacy API: preload(images, retries)
+	const retries = typeof options === 'number' ? options : (options.retries || 3);
+	const onLoad = typeof options === 'object' ? options.onLoad : undefined;
+	const onError = typeof options === 'object' ? options.onError : undefined;
+
 	return new Promise((resolve) => {
 		// single object
 		if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
 			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl, input.headers, retries)
 				.then(() => {
+					if (onLoad) {
+						onLoad(input.uri);
+					}
 					resolve();
 				})
 				.catch((err) => {
 					console.error(`Error preloading single image: ${input.uri}`, err);
+					if (onError) {
+						onError(input.uri, err);
+					}
 					resolve(); // Count as handled even if failed to continue processing
 				});
 		}
@@ -348,6 +359,9 @@ BlastedImage.preload = (input, retries = 3) => {
 			input.forEach(image => {
 				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl, image.headers, retries)
 					.then(() => {
+						if (onLoad) {
+							onLoad(image.uri);
+						}
 						loadedCount++;
 						if (loadedCount === input.length) {
 							resolve();
@@ -355,6 +369,9 @@ BlastedImage.preload = (input, retries = 3) => {
 					})
 					.catch((err) => {
 						console.error(`Error preloading one of the array images: ${image.uri}`, err);
+						if (onError) {
+							onError(image.uri, err);
+						}
 						loadedCount++; // Count as handled even if failed to continue processing
 						if (loadedCount === input.length) {
 							resolve();

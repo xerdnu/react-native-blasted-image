@@ -61,6 +61,14 @@ RCT_EXPORT_MODULE(BlastedImage);
 }
 
 - (NSString *)extractImagePathFromUrl:(NSString *)imageUrl cloudUrl:(NSString *)cloudUrl {
+    // Safety check for nil or NSNull
+    if (!imageUrl || ![imageUrl isKindOfClass:[NSString class]]) {
+        return @"";
+    }
+    if (!cloudUrl || ![cloudUrl isKindOfClass:[NSString class]]) {
+        cloudUrl = @"";
+    }
+    
     NSString *imagePath = [imageUrl stringByReplacingOccurrencesOfString:cloudUrl withString:@""];
     NSRange range = [imagePath rangeOfString:@"?alt=media"];
     if (range.location != NSNotFound) {
@@ -71,6 +79,11 @@ RCT_EXPORT_MODULE(BlastedImage);
 }
 
 - (BOOL)doesFileExistInAssets:(NSString *)filePath {
+    // Safety check for filePath
+    if (!filePath || ![filePath isKindOfClass:[NSString class]]) {
+        return NO;
+    }
+    
     NSString *resourcePath = [[NSBundle mainBundle] pathForResource:filePath ofType:nil];
     BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:resourcePath];
 
@@ -82,6 +95,11 @@ RCT_EXPORT_MODULE(BlastedImage);
             cloudUrl:(NSString *)cloudUrl
              headers:(NSDictionary *)headers
              showLog:(BOOL)showLog {
+    
+    // Safety check for imageUrl
+    if (!imageUrl || ![imageUrl isKindOfClass:[NSString class]]) {
+        return nil;
+    }
     
     NSString *imagePath = @"";
     NSURL *url;
@@ -126,7 +144,7 @@ RCT_EXPORT_MODULE(BlastedImage);
         url = [NSURL URLWithString:imageUrl];
         
         // Configure headers if provided
-        if (headers && headers.count > 0) {
+        if (headers && [headers isKindOfClass:[NSDictionary class]] && headers.count > 0) {
             if (showLog) {
                 [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Configuring %lu headers for request", (unsigned long)headers.count]];
             }
@@ -155,11 +173,15 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
 
     // Create context with headers if provided
     SDWebImageContext *context = nil;
-    if (headers && headers.count > 0) {
+    if (headers && [headers isKindOfClass:[NSDictionary class]] && headers.count > 0) {
         SDWebImageDownloaderRequestModifier *requestModifier = [[SDWebImageDownloaderRequestModifier alloc] initWithBlock:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull request) {
             NSMutableURLRequest *mutableRequest = [request mutableCopy];
             for (NSString *key in headers) {
-                [mutableRequest setValue:headers[key] forHTTPHeaderField:key];
+                id value = headers[key];
+                // Safety check: ensure value is not NSNull and can be converted to string
+                if (value && ![value isKindOfClass:[NSNull class]]) {
+                    [mutableRequest setValue:[NSString stringWithFormat:@"%@", value] forHTTPHeaderField:key];
+                }
             }
             return [mutableRequest copy];
         }];

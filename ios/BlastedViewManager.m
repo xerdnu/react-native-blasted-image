@@ -21,6 +21,11 @@ RCT_EXPORT_MODULE(BlastedImageView);
 }
 
 - (UIColor *)colorFromHexString:(NSString *)hexString {
+    // Ensure hexString is actually a string
+    if (!hexString || ![hexString isKindOfClass:[NSString class]]) {
+        return [UIColor blackColor];
+    }
+    
     if ([hexString hasPrefix:@"#"]) {
         hexString = [hexString substringFromIndex:1];
     }
@@ -68,11 +73,15 @@ RCT_CUSTOM_VIEW_PROPERTY(source, NSDictionary, UIImageView) {
         
         // Create context with headers if provided
         SDWebImageContext *context = nil;
-        if (headers && headers.count > 0) {
+        if (headers && [headers isKindOfClass:[NSDictionary class]] && headers.count > 0) {
             SDWebImageDownloaderRequestModifier *requestModifier = [[SDWebImageDownloaderRequestModifier alloc] initWithBlock:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull request) {
                 NSMutableURLRequest *mutableRequest = [request mutableCopy];
                 for (NSString *key in headers) {
-                    [mutableRequest setValue:headers[key] forHTTPHeaderField:key];
+                    id value = headers[key];
+                    // Safety check: ensure value is not NSNull and can be converted to string
+                    if (value && ![value isKindOfClass:[NSNull class]]) {
+                        [mutableRequest setValue:[NSString stringWithFormat:@"%@", value] forHTTPHeaderField:key];
+                    }
                 }
                 return [mutableRequest copy];
             }];

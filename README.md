@@ -12,7 +12,7 @@ I truly appreciate your support. If you like **BlastedImage** and want to suppor
 
 **[Applane](https://applane.net)** is a small SaaS tool I’m building for app developers who want to manage App Store Connect and Google Play metadata with ease. It helps you edit your listing once, translate it into 80+ languages, create localized screenshots, and publish everything to both stores — without spreadsheets, endless copy-paste, or losing hours or days on metadata handling.
 
-It’s made for indie developers and small teams who want app localization and ASO work to feel less painful.
+It’s made for indie developers, small teams, and growing app businesses who want app localization, ASO, and store metadata handling to feel easier, faster, and less painful.
 
 I’m still building and improving it, so every visit, piece of feedback, or share means a lot.
 
@@ -262,7 +262,7 @@ I truly appreciate your support. If you like **BlastedImage** and want to suppor
 
 **[Applane](https://applane.net)** is a small SaaS tool I’m building for app developers who want to manage App Store Connect and Google Play metadata with ease. It helps you edit your listing once, translate it into 80+ languages, create localized screenshots, and publish everything to both stores — without spreadsheets, endless copy-paste, or losing hours or days on metadata handling.
 
-It’s made for indie developers and small teams who want app localization and ASO work to feel less painful.
+It’s made for indie developers, small teams, and growing app businesses who want app localization, ASO, and store metadata handling to feel easier, faster, and less painful.
 
 I’m still building and improving it, so every visit, piece of feedback, or share means a lot.
 

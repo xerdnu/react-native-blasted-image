@@ -7,17 +7,16 @@
 A simple yet powerful image component for React Native, powered by [Glide](https://github.com/bumptech/glide) (Android) and [SDWebImage](https://github.com/SDWebImage/SDWebImage) (iOS).
 
 ## Support My Work! 🎉
-I truly appreciate your support! If you'd like to help me out, the best way is to check out my apps — **LogoDuel** and **WaterTrack**.
 
-⚔️ **LogoDuel** is a fun, turn-based multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+I truly appreciate your support. If you like **BlastedImage** and want to support my work, feel free to check out my latest project: **[Applane](https://applane.net)**.
 
-🚀 **Powered by BlastedImage** for performant and optimized image handling.
+**[Applane](https://applane.net)** is a small SaaS tool I’m building for app developers who want to manage App Store Connect and Google Play metadata with ease. It helps you edit your listing once, translate it into 80+ languages, create localized screenshots, and publish everything to both stores — without spreadsheets, endless copy-paste, or losing hours or days on metadata handling.
 
-[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
+It’s made for indie developers and small teams who want app localization and ASO work to feel less painful.
 
-💧 **WaterTrack** is a clean and simple water reminder app that helps you stay hydrated throughout the day — no subscriptions, no fuss, just hydration made easy.
+I’m still building and improving it, so every visit, piece of feedback, or share means a lot.
 
-[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
+[![Visit Applane](https://img.shields.io/badge/Visit-Applane.net-059669?style=for-the-badge&labelColor=0B1220)](https://applane.net)
 
 ## Description
 Caching remote images has always been a challenge for me with the Image component in React Native. This simplified, yet powerful component, addresses that issue head-on. It offers a robust and performant mechanism for caching remote images, ensuring they're displayed quickly.<br><br>Leveraging the strengths of Glide and SDWebImage, it supports both memory and disk caching for remote images. The newly added Hybrid Assets feature allows you to bundle remote assets in your build, fetching from the network only when necessary. Notably, while it provides these enhanced capabilities for remote images, it seamlessly integrates with the standard React Native Image component when handling local assets using require.
@@ -258,13 +257,16 @@ useEffect(() => {
 This component was created with inspiration from [react-native-fast-image](https://github.com/DylanVann/react-native-fast-image) that also uses [Glide](https://github.com/bumptech/glide) and [SDWebImage](https://github.com/SDWebImage/SDWebImage). But due to its lack of ongoing maintenance i felt the need to develop this new image component to continue providing robust and performant caching functionality.
 
 ## Support My Work! 🎉
-I truly appreciate your support! If you'd like to help me out, the best way is to check out my latest app — **LogoDuel**.
 
-**LogoDuel** is a fun, turn-based multiplayer trivia game where you challenge friends (or foes!) to guess famous logos. Test your brand knowledge and see who comes out on top!
+I truly appreciate your support. If you like **BlastedImage** and want to support my work, feel free to check out my latest project: **[Applane](https://applane.net)**.
 
-🚀 **Powered by BlastedImage** for performant and optimized image handling.<br><br>👉 Download now and let the logo battle begin!
+**[Applane](https://applane.net)** is a small SaaS tool I’m building for app developers who want to manage App Store Connect and Google Play metadata with ease. It helps you edit your listing once, translate it into 80+ languages, create localized screenshots, and publish everything to both stores — without spreadsheets, endless copy-paste, or losing hours or days on metadata handling.
 
-[![Get it on Google Play](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play&style=for-the-badge)](https://play.google.com/store/apps/details?id=se.netblast.logoduellen) [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-blue?logo=apple&style=for-the-badge)](https://apps.apple.com/us/app/logoduel/id6470379520)
+It’s made for indie developers and small teams who want app localization and ASO work to feel less painful.
+
+I’m still building and improving it, so every visit, piece of feedback, or share means a lot.
+
+[![Visit Applane](https://img.shields.io/badge/Visit-Applane.net-059669?style=for-the-badge&labelColor=0B1220)](https://applane.net)
 
 ## Contributing
 Contributions are welcome! If you find a bug or have a feature request, please open an issue. If you want to contribute code, please open a pull request.

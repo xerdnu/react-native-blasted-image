@@ -1,3 +1,14 @@
+## [1.1.6] (2026-07-10)
+
+#### ✨ New Features
+
+-   Added support for custom cache keys via `cacheKey` in the `source` object (also supported in `preload` items). Useful when the domain of your image URLs changes over time (e.g. rotating CDN domains) but the path stays the same, allowing the cache to be reused instead of re-downloading the same image.
+-   Added a `cacheKeyExtractor` prop that receives the image `uri` and returns a custom cache key, as an alternative to setting `cacheKey` directly in `source`.
+
+#### 🔄 Changes
+
+-   Updated documentation.
+
 ## [1.1.5] (2025-11-26)
 
 #### 🐛 Bug Fixes
@@ -299,6 +310,7 @@ dependencies {
 
 -   Initial release.
 
+[1.1.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.2...v1.1.3

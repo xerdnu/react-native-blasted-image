@@ -21,7 +21,7 @@ const BlastedImageView = requireNativeComponent('BlastedImageView');
 
 const requestsCache = {};
 
-export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null, headers = null, retries = 3) => {
+export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = false, cloudUrl = null, headers = null, retries = 3, cacheKey = null) => {
 
 	if (typeof retries !== 'number' || retries <= 0) {
 		retries = 1;
@@ -33,12 +33,12 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 	}
 
 	const headersKey = headers ? JSON.stringify(headers) : '';
-	const cacheKey = `${imageUrl}::${!!skipMemoryCache}::${!!hybridAssets}::${cloudUrl || ''}::${headersKey}`;
+	const requestKey = `${imageUrl}::${!!skipMemoryCache}::${!!hybridAssets}::${cloudUrl || ''}::${headersKey}::${cacheKey || ''}`;
 
 
-	if (!requestsCache[cacheKey]) {
+	if (!requestsCache[requestKey]) {
 
-        requestsCache[cacheKey] = new Promise(async (resolve, reject) => {
+        requestsCache[requestKey] = new Promise(async (resolve, reject) => {
 
 			let wasRetried = false;
 
@@ -49,13 +49,13 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
 					// await new Promise(resolve => setTimeout(resolve, 5000)); Keep for testing purposes
 				}
                 try {
-                    await NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl, headers);
+                    await NativeBlastedImage.loadImage(imageUrl, skipMemoryCache, hybridAssets, cloudUrl, headers, cacheKey);
                     resolve({ wasRetried });
                     return;
                 } catch (error) {
                     console.warn(`[BlastedImage] Attempt ${attempt} failed for ${imageUrl}`);
                     if (attempt === retries) {
-                        delete requestsCache[cacheKey]; // Clear failed cache entry
+                        delete requestsCache[requestKey]; // Clear failed cache entry
                         reject(error);
                     }
                 }
@@ -63,22 +63,23 @@ export const loadImage = (imageUrl, skipMemoryCache = false, hybridAssets = fals
         });
 	}
 
-	return requestsCache[cacheKey];	
+	return requestsCache[requestKey];
 };
 
-const BlastedImage = ({ 
+const BlastedImage = ({
 	resizeMode = "cover",
 	isBackground = false,
 	returnSize = false,
 	fallbackSource = null,
 	tintColor = null,
 	retries = 3,
+	cacheKeyExtractor = null,
 	source,
-	width, 
-	onLoad, 
-	onError, 
-	height, 
-	style, 
+	width,
+	onLoad,
+	onError,
+	height,
+	style,
 	children
 }) => {
 	const [error, setError] = useState(false);
@@ -92,12 +93,25 @@ const BlastedImage = ({
 			headers: null,
 			hybridAssets: false,
 			cloudUrl: null,
+			cacheKey: null,
 			...source
 		};
 
 		if (source.hybridAssets && source.cloudUrl === null) {
 			console.error("When using hybridAssets, you must specify a cloudUrl prop. This is the base URL where the local assets are hosted.");
 			source.hybridAssets = false;
+		}
+
+		// Resolve custom cache key from extractor if no explicit cacheKey was provided
+		if (!source.cacheKey && typeof cacheKeyExtractor === 'function' && source.uri) {
+			try {
+				const extractedKey = cacheKeyExtractor(source.uri);
+				if (typeof extractedKey === 'string' && extractedKey.length > 0) {
+					source.cacheKey = extractedKey;
+				}
+			} catch (err) {
+				console.warn("[BlastedImage] cacheKeyExtractor threw an error, falling back to the full URL as cache key.", err);
+			}
 		}
 	}
 
@@ -148,7 +162,7 @@ const BlastedImage = ({
 		}
 		*/
 
-		loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, source.headers, retries)
+		loadImage(source.uri, false, source.hybridAssets, source.cloudUrl, source.headers, retries, source.cacheKey)
 		.then(({wasRetried}) => {
 			// Finally succeeded
 			isDoneRef.current = true;
@@ -332,7 +346,7 @@ BlastedImage.preload = (input, options = {}) => {
 	return new Promise((resolve) => {
 		// single object
 		if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
-			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl, input.headers, retries)
+			loadImage(input.uri, input.skipMemoryCache, input.hybridAssets, input.cloudUrl, input.headers, retries, input.cacheKey)
 				.then(() => {
 					if (onLoad) {
 						onLoad(input.uri);
@@ -357,7 +371,7 @@ BlastedImage.preload = (input, options = {}) => {
 			}
 
 			input.forEach(image => {
-				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl, image.headers, retries)
+				loadImage(image.uri, image.skipMemoryCache, image.hybridAssets, image.cloudUrl, image.headers, retries, image.cacheKey)
 					.then(() => {
 						if (onLoad) {
 							onLoad(image.uri);

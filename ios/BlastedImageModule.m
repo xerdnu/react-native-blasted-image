@@ -154,12 +154,13 @@ RCT_EXPORT_MODULE(BlastedImage);
     return url;
 }
 
-RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl 
-                skipMemoryCache:(BOOL)skipMemoryCache 
-                hybridAssets:(BOOL)hybridAssets 
+RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
+                skipMemoryCache:(BOOL)skipMemoryCache
+                hybridAssets:(BOOL)hybridAssets
                 cloudUrl:(NSString *)cloudUrl
                 headers:(NSDictionary *)headers
-                resolver:(RCTPromiseResolveBlock)resolve 
+                cacheKey:(NSString *)cacheKey
+                resolver:(RCTPromiseResolveBlock)resolve
                 rejecter:(RCTPromiseRejectBlock)reject) {
 
     // If showing image right after setting up NativeEventEmitters (BlastedEventLog etc.) the log might not show on iOS. Fix is to add a delay before showing the image but this is not a good solution or an option for production. Lets keep it as it is for now.
@@ -171,8 +172,8 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
         options |= SDWebImageAvoidAutoSetImage;
     }
 
-    // Create context with headers if provided
-    SDWebImageContext *context = nil;
+    // Create context with headers and/or custom cache key if provided
+    NSMutableDictionary *mutableContext = [NSMutableDictionary dictionary];
     if (headers && [headers isKindOfClass:[NSDictionary class]] && headers.count > 0) {
         SDWebImageDownloaderRequestModifier *requestModifier = [[SDWebImageDownloaderRequestModifier alloc] initWithBlock:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull request) {
             NSMutableURLRequest *mutableRequest = [request mutableCopy];
@@ -185,8 +186,19 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
             }
             return [mutableRequest copy];
         }];
-        context = @{SDWebImageContextDownloadRequestModifier: requestModifier};
+        mutableContext[SDWebImageContextDownloadRequestModifier] = requestModifier;
     }
+
+    // Custom cache key only applies to remote urls (not local hybrid assets or base64 data URIs)
+    BOOL useCustomCacheKey = (cacheKey && [cacheKey isKindOfClass:[NSString class]] && cacheKey.length > 0 && url != nil && ![url isFileURL] && ![imageUrl hasPrefix:@"data:image/"]);
+    if (useCustomCacheKey) {
+        [self sendEventWithName:@"BlastedEventLog" message:[NSString stringWithFormat:@"Using custom cache key: %@", cacheKey]];
+        mutableContext[SDWebImageContextCacheKeyFilter] = [SDWebImageCacheKeyFilter cacheKeyFilterWithBlock:^NSString * _Nullable(NSURL * _Nonnull filterUrl) {
+            return cacheKey;
+        }];
+    }
+
+    SDWebImageContext *context = mutableContext.count > 0 ? [mutableContext copy] : nil;
 
     // Load/Show image using show and preload
     [[SDWebImageManager sharedManager] loadImageWithURL:url
@@ -198,7 +210,8 @@ RCT_EXPORT_METHOD(loadImage:(NSString *)imageUrl
             reject(@"ERROR", @"Failed to cache image", error);
         } else {
             if (skipMemoryCache) {
-                [[SDImageCache sharedImageCache] removeImageForKey:imageUrl fromDisk:NO withCompletion:nil];
+                NSString *removalKey = useCustomCacheKey ? cacheKey : imageUrl;
+                [[SDImageCache sharedImageCache] removeImageForKey:removalKey fromDisk:NO withCompletion:nil];
             }
 
             NSString *message;

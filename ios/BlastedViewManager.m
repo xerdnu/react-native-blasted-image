@@ -64,15 +64,16 @@ RCT_CUSTOM_VIEW_PROPERTY(source, NSDictionary, UIImageView) {
     BOOL hybridAssets = [RCTConvert BOOL:json[@"hybridAssets"]];
     NSString *cloudUrl = [RCTConvert NSString:json[@"cloudUrl"]];
     NSDictionary *headers = [RCTConvert NSDictionary:json[@"headers"]];
+    NSString *cacheKey = [RCTConvert NSString:json[@"cacheKey"]];
     NSString *tintColorHex = [RCTConvert NSString:json[@"tintColor"]];
 
     NSURL *url = [blastedImageModule prepareUrl:uri hybridAssets:hybridAssets cloudUrl:cloudUrl headers:headers showLog:NO];
 
     if (url != nil && ![url.absoluteString isEqualToString:@""]) {
         UIColor *storedTintColor = objc_getAssociatedObject(view, @selector(tintColor));
-        
-        // Create context with headers if provided
-        SDWebImageContext *context = nil;
+
+        // Create context with headers and/or custom cache key if provided
+        NSMutableDictionary *mutableContext = [NSMutableDictionary dictionary];
         if (headers && [headers isKindOfClass:[NSDictionary class]] && headers.count > 0) {
             SDWebImageDownloaderRequestModifier *requestModifier = [[SDWebImageDownloaderRequestModifier alloc] initWithBlock:^NSURLRequest * _Nullable(NSURLRequest * _Nonnull request) {
                 NSMutableURLRequest *mutableRequest = [request mutableCopy];
@@ -85,8 +86,17 @@ RCT_CUSTOM_VIEW_PROPERTY(source, NSDictionary, UIImageView) {
                 }
                 return [mutableRequest copy];
             }];
-            context = @{SDWebImageContextDownloadRequestModifier: requestModifier};
+            mutableContext[SDWebImageContextDownloadRequestModifier] = requestModifier;
         }
+
+        // Custom cache key only applies to remote urls (not local hybrid assets or base64 data URIs)
+        if (cacheKey && [cacheKey isKindOfClass:[NSString class]] && cacheKey.length > 0 && ![url isFileURL] && ![uri hasPrefix:@"data:image/"]) {
+            mutableContext[SDWebImageContextCacheKeyFilter] = [SDWebImageCacheKeyFilter cacheKeyFilterWithBlock:^NSString * _Nullable(NSURL * _Nonnull filterUrl) {
+                return cacheKey;
+            }];
+        }
+
+        SDWebImageContext *context = mutableContext.count > 0 ? [mutableContext copy] : nil;
 
         if (!storedTintColor) {
             if (context) {

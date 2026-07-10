@@ -12,6 +12,7 @@ declare module 'react-native-blasted-image' {
       headers?: { [key: string]: string };
       hybridAssets?: boolean;
       cloudUrl?: string | null;
+      cacheKey?: string | null;
     }
 
     interface BlastedImageProps {
@@ -28,6 +29,7 @@ declare module 'react-native-blasted-image' {
       children?: React.ReactNode;
       retries?: number;
       tintColor?: string;
+      cacheKeyExtractor?: (uri: string) => string;
     }
   
     interface BlastedImageStatic {
@@ -36,8 +38,8 @@ declare module 'react-native-blasted-image' {
       clearAllCaches(): void;
       preload(
         input:
-            | { uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }
-            | Array<{ uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null }>,
+            | { uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null; cacheKey?: string | null }
+            | Array<{ uri: string; headers?: { [key: string]: string }; skipMemoryCache?: boolean; hybridAssets?: boolean; cloudUrl?: string | null; cacheKey?: string | null }>,
         options?: {
           retries?: number;
           onLoad?: (uri: string) => void;
@@ -53,7 +55,9 @@ declare module 'react-native-blasted-image' {
       skipMemoryCache?: boolean,
       hybridAssets?: boolean,
       cloudUrl?: string | null,
-      headers?: { [key: string]: string }
+      headers?: { [key: string]: string },
+      retries?: number,
+      cacheKey?: string | null
     ): Promise<void>;
   
     export default BlastedImage;

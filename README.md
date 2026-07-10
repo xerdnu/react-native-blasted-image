@@ -101,6 +101,26 @@ import BlastedImage from 'react-native-blasted-image';
   width={200}
   height={200}
 />
+
+// With a custom cache key (useful when your CDN domain changes but the path stays the same)
+<BlastedImage 
+  source={{ 
+    uri: 'https://cdn-a.example.com/images/banner.png',
+    cacheKey: '/images/banner.png'
+  }} 
+  resizeMode="cover"
+  width={200}
+  height={200}
+/>
+
+// Same thing but with a cacheKeyExtractor that derives the cache key from the uri
+<BlastedImage 
+  source={{ uri: 'https://cdn-a.example.com/images/banner.png' }} 
+  cacheKeyExtractor={(uri) => uri.replace(/^https?:\/\/[^/]+/, '')}
+  resizeMode="cover"
+  width={200}
+  height={200}
+/>
 ```
 
 ## Paramaters
@@ -113,6 +133,7 @@ import BlastedImage from 'react-native-blasted-image';
 | `isBackground` | `Boolean`          | (Optional) Makes the image act as a container background similar to the native `ImageBackground` component  | false |
 | `returnSize` | `Boolean`          | (Optional) Specifies if `Size` parameters should be returned in `onLoad` callback.  | false |
 | `retries` | `Number`          | (Optional) Specifies the number of retry attempts if the image fails to load.  | 3 |
+| `cacheKeyExtractor` | `Function`          | (Optional) Function that receives the image `uri` and returns a custom cache key string. Useful when the domain of your image URLs changes over time (e.g. rotating CDN domains) but the path stays the same. Ignored if `cacheKey` is set directly in `source`. Only applies to remote images.  | - |
 | `tintColor` | `String`          | (Optional) Specifies tintColor for the image using hexadecimal/named colors.  | - |
 | `fallbackSource` | `Object`          | (Optional) Object containing a `uri` string for a custom error image.  | - |
 | `onLoad` | `Function`          | (Optional) Callback function that gets called when the image has loaded succesfully.<br>Returns `Size` parameters of the source image if `returnSize` set to `true`  | - |
@@ -125,6 +146,7 @@ import BlastedImage from 'react-native-blasted-image';
 | `headers`     | `Object` | (Optional) HTTP headers to send with the image request, e.g., `{ Authorization: 'Bearer token' }`. Only applies to remote URLs.     | -       |
 | `hybridAssets`      | `Boolean`          | (Optional) Enables the Hybrid Assets feature to bundle remote assets locally and fetch from the network if not included.                                                        | false     |
 | `cloudUrl`     | `String`          | (Optional) Leading URL to the remote assets for Hybrid Assets functionality.<br>(Required if `hybridAssets` is enabled)                                                       | null     |
+| `cacheKey`     | `String`          | (Optional) Custom cache key for the image. By default the full URL is used as cache key which means the cache is missed if the domain changes. Provide a stable value (e.g. the URL path `/images/banner.png`) to keep cache hits across changing domains. Only applies to remote images.                                                       | null     |
 
 ## Methods
 ```jsx
@@ -145,6 +167,10 @@ BlastedImage.preload([
     headers: {
       Authorization: 'Bearer your-token-here'
     }
+  },
+  { 
+    uri: 'https://cdn-a.example.com/images/banner.png',
+    cacheKey: '/images/banner.png' // Custom cache key that survives CDN domain changes
   }
 ], 5); // Legacy API: retries as second parameter
 
@@ -166,7 +192,7 @@ BlastedImage.preload([
 
 | Method                          | PropType                  | Description                                              |
 |---------------------------------|---------------------------|----------------------------------------------------------|
-| `BlastedImage.preload()`        | `(images: Array<{ uri: string, headers?: object, skipMemoryCache?: bool, hybridAssets?: bool, cloudUrl?: string }>, options?: number \| { retries?: number, onLoad?: (uri: string) => void, onError?: (uri: string, error: any) => void })`  | Preloads remote images from an array of URIs. Supports custom HTTP headers, retry configuration, and optional callbacks for tracking individual image load success/failure.                   |
+| `BlastedImage.preload()`        | `(images: Array<{ uri: string, headers?: object, skipMemoryCache?: bool, hybridAssets?: bool, cloudUrl?: string, cacheKey?: string }>, options?: number \| { retries?: number, onLoad?: (uri: string) => void, onError?: (uri: string, error: any) => void })`  | Preloads remote images from an array of URIs. Supports custom HTTP headers, custom cache keys, retry configuration, and optional callbacks for tracking individual image load success/failure.                   |
 | `BlastedImage.clearDiskCache()` | -                         | Clears the disk cache for all images.                    |
 | `BlastedImage.clearMemoryCache()`| -                         | Clears the memory cache for all images.                  |
 | `BlastedImage.clearAllCaches()` | -                         | Clears both disk and memory caches for all images.       |

@@ -54,12 +54,13 @@ public class BlastedViewManager extends SimpleViewManager<ImageView> {
             boolean hybridAssets = source.hasKey("hybridAssets") && source.getBoolean("hybridAssets");
             String cloudUrl = source.hasKey("cloudUrl") ? source.getString("cloudUrl") : null;
             ReadableMap headers = source.hasKey("headers") ? source.getMap("headers") : null;
-            
+            String cacheKey = source.hasKey("cacheKey") ? source.getString("cacheKey") : null;
+
             ThemedReactContext themedReactContext = (ThemedReactContext) view.getContext();
             ReactApplicationContext reactContext = (ReactApplicationContext) themedReactContext.getReactApplicationContext();
             BlastedImageModule blastedImageModule = new BlastedImageModule(reactContext);
 
-            Object glideUrl = blastedImageModule.prepareGlideUrl(uri, hybridAssets, cloudUrl, false, headers); // false = Dont show logs when not preload
+            Object glideUrl = blastedImageModule.prepareGlideUrl(uri, hybridAssets, cloudUrl, false, headers, cacheKey); // false = Dont show logs when not preload
 
             Log.d("BlastedViewManager", "glideUrl value: " + glideUrl.toString());
 

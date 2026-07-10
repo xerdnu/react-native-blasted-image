@@ -98,7 +98,7 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
         }
     }
 
-    public Object prepareGlideUrl(String imageUrl, boolean hybridAssets, String cloudUrl, boolean showLog, @Nullable ReadableMap headers) throws Exception {
+    public Object prepareGlideUrl(String imageUrl, boolean hybridAssets, String cloudUrl, boolean showLog, @Nullable ReadableMap headers, @Nullable String cacheKey) throws Exception {
         String imagePath = "";
         Object glideUrl; 
         boolean fileExistsInAssets = false;
@@ -126,20 +126,24 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
                 if (showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Local assets disabled. Use remote url: " + imageUrl);
             }
 
+            // Custom cache key only applies to remote urls
+            boolean hasCacheKey = cacheKey != null && !cacheKey.isEmpty();
+            if (hasCacheKey && showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Using custom cache key: " + cacheKey);
+
             // Build GlideUrl with headers if provided
             if (headers != null && headers.toHashMap().size() > 0) {
                 LazyHeaders.Builder headersBuilder = new LazyHeaders.Builder();
-                
+
                 for (Map.Entry<String, Object> entry : headers.toHashMap().entrySet()) {
                     if (entry.getValue() != null) {
                         headersBuilder.addHeader(entry.getKey(), entry.getValue().toString());
                         if (showLog) sendEvent(getReactApplicationContext(), "BlastedEventLog", "Adding header: " + entry.getKey() + " = " + entry.getValue().toString());
                     }
                 }
-                
-                glideUrl = new GlideUrl(imageUrl, headersBuilder.build());
+
+                glideUrl = hasCacheKey ? new BlastedGlideUrl(imageUrl, cacheKey, headersBuilder.build()) : new GlideUrl(imageUrl, headersBuilder.build());
             } else {
-                glideUrl = new GlideUrl(imageUrl);
+                glideUrl = hasCacheKey ? new BlastedGlideUrl(imageUrl, cacheKey) : new GlideUrl(imageUrl);
             }
         }
 
@@ -148,11 +152,11 @@ public class BlastedImageModule extends ReactContextBaseJavaModule {
 
     // Show/Preload the image
     @ReactMethod
-    public void loadImage(String imageUrl, boolean skipMemoryCache, boolean hybridAssets, String cloudUrl, @Nullable ReadableMap headers, Promise promise) {
+    public void loadImage(String imageUrl, boolean skipMemoryCache, boolean hybridAssets, String cloudUrl, @Nullable ReadableMap headers, @Nullable String cacheKey, Promise promise) {
 
         try {
             // See BlastedImageModule.m for details regarding NativeEventEmitters (BlastedEventLog etc.)
-            Object glideUrl = prepareGlideUrl(imageUrl, hybridAssets, cloudUrl, true, headers);
+            Object glideUrl = prepareGlideUrl(imageUrl, hybridAssets, cloudUrl, true, headers, cacheKey);
 
             // Is skip skipMemoryCache set for image and should we store it only to disk?
             RequestOptions requestOptions = new RequestOptions();

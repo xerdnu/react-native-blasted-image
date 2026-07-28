@@ -28,6 +28,16 @@ Caching remote images has always been a challenge for me with the Image componen
 - **Customizable**: Wrapped within a `View` for added layout and style customization.
 - **Robust Caching**: Benefits from both memory and disk caching for maximum performance.
 - **Hybrid Assets**: Bundle remote assets within your build and only fetch from the network if assets are not included.
+- **New Architecture**: Works on both the New Architecture (React Native 0.74+) and the old architecture.
+
+## New Architecture
+
+BlastedImage is compatible with the React Native **New Architecture** and works out of the box through React Native's official interop layer (no extra configuration needed).
+
+- **New Architecture (Fabric/Bridgeless)**: Supported on React Native **0.74 and newer** where the interop layer is applied automatically.
+- **Old Architecture**: Fully supported as before (React Native >= 0.60).
+
+> **Note**: If you have the New Architecture enabled on React Native 0.72/0.73 you need to upgrade to 0.74+ since the automatic interop layer for native components was introduced in 0.74.
 
 ## Supported Image Types
 

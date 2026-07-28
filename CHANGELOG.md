@@ -1,3 +1,10 @@
+## [1.1.7] (2026-07-28)
+
+#### 🔄 Changes
+
+-   Documented New Architecture compatibility. BlastedImage works on the New Architecture out of the box via React Native's interop layer (requires React Native 0.74+ when the New Architecture is enabled). The old architecture remains fully supported.
+-   Updated documentation.
+
 ## [1.1.6] (2026-07-10)
 
 #### ✨ New Features
@@ -310,6 +317,7 @@ dependencies {
 
 -   Initial release.
 
+[1.1.7]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/xerdnu/react-native-blasted-image/compare/v1.1.3...v1.1.4
